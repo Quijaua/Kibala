@@ -1,24 +1,13 @@
-<div align="center" style="margin-bottom: 20px; margin-top: 20px;">
-    <img src="app/assets/img/logo.png" width="330">
-</div>
+# Kibala
+Kibala é um sistema de banco de dados voltado para a catalogação e o gerenciamento de acervos
 
----
-
-## Sobre o sistema
-
-Sistema de banco de dados voltado para a catalogação, o gerenciamento e a extroversão de acervos, desenvolvido pela
-<a href="https://paramosoftware.com.br" target="_blank">Páramo Software</a>.
-
-## Documentação
-
-A documentação do sistema está disponível <a href="https://paramosoftware.com.br/documentacao" target="_blank">
-aqui</a>.
-
-## Dúvidas, bugs e sugestões
-
-Para o esclarecimento de dúvidas e a comunicação de bugs e sugestões, a Páramo Software disponibiliza
-um <a href="https://forum.paramosoftware.com.br" target="_blank">fórum</a>
+Sistema baseado em [Páramo](https://github.com/paramosoftware/paramo), com melhorias e novas funcionalidades.
 
 ## Licença
 
-O sistema é distribuído sob a licença <a href="https://opensource.org/license/mit/" target="_blank">MIT</a>.
+Este projeto está licenciado sob a [Licença MIT](LICENSE).
+
+## Créditos
+- Projeto original: [Páramo](https://github.com/paramosoftware/paramo)
+- Copyright (c) 2023-2025 Páramo Software
+- Modificações e melhorias: Quijaua (2025)
