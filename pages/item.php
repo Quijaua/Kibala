@@ -4,16 +4,26 @@
                 b.codigo AS codigo_livro,
                 b.cutter_pha,
                 b.numero_paginas,
-                c.codigo AS acervo_codigo,
-                c.identificador AS acervo_identificador,
-                c.nome AS acervo_nome
+                d.codigo AS acervo_codigo,
+                d.identificador AS acervo_identificador,
+                d.nome AS acervo_nome,
+                f.nome AS subcategoria,
+                g.nome AS categoria
             FROM item_acervo a
             LEFT JOIN livro b ON a.codigo = b.item_acervo_codigo
-            LEFT JOIN acervo c ON a.acervo_codigo = c.codigo
+            LEFT JOIN documento c ON a.codigo = c.item_acervo_codigo
+            LEFT JOIN acervo d ON a.acervo_codigo = d.codigo
+            LEFT JOIN agrupamento e ON c.agrupamento_codigo = e.codigo
+            LEFT JOIN agrupamento_dados_textuais f ON e.codigo = f.agrupamento_codigo
+            LEFT JOIN agrupamento_dados_textuais g ON e.agrupamento_superior_codigo = g.agrupamento_codigo
             WHERE a.codigo = ?";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$param]);
     $dado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$dado) {
+        header('Location: ' . INCLUDE_PATH);
+    }
 
     $sql = "SELECT
             b.nome AS autor,
@@ -72,7 +82,7 @@
     <div class="single--top --livro">
         <h1 class="title">
 			<?= $dado['identificador']; ?>
-            <span><?= $dado['instituicao_codigo']; ?></span>
+            <span><?= $dado['codigo']; ?></span>
 		</h1>
 
         <div class="breadcrumb">
@@ -80,9 +90,19 @@
             <a class='breadcrumb--link'> / </a>
             <a href="<?= INCLUDE_PATH; ?>acervo" title="Acervo" class="breadcrumb--link">Acervo</a>
             <a class='breadcrumb--link'> / </a>
+            <?php if (isset($dado['acervo_codigo']) && !empty($dado['acervo_codigo'])): ?>
             <a href="<?= INCLUDE_PATH; ?>acervo?acervo=<?= $dado['acervo_codigo']; ?>" title="<?= $dado['acervo_identificador']; ?>" class="breadcrumb--link"><?= $dado['acervo_nome']; ?></a>
             <a class='breadcrumb--link'> / </a>
-            <a href="#" class="breadcrumb--link"><?= $dado['instituicao_codigo']; ?></a>
+            <?php endif; ?>
+             <?php if (isset($dado['categoria']) && !empty($dado['categoria'])): ?>
+            <a href="<?= INCLUDE_PATH; ?>acervo?acervo=<?= $dado['acervo_codigo']; ?>" title="<?= $dado['categoria']; ?>" class="breadcrumb--link"><?= $dado['categoria']; ?></a>
+            <a class='breadcrumb--link'> / </a>
+            <?php endif; ?>
+            <?php if (isset($dado['subcategoria']) && !empty($dado['subcategoria'])): ?>
+            <a href="<?= INCLUDE_PATH; ?>acervo?acervo=<?= $dado['acervo_codigo']; ?>" title="<?= $dado['subcategoria']; ?>" class="breadcrumb--link"><?= $dado['subcategoria']; ?></a>
+            <a class='breadcrumb--link'> / </a>
+            <?php endif; ?>
+            <a href="#" class="breadcrumb--link"><?= $dado['codigo']; ?></a>
         </div>
     </div>
 
@@ -104,22 +124,22 @@
 
                 <div class="single--details">
                     <div class="single--details--list-social">
-                        <a  class="social pointer" onclick="shareLink('facebook', 'Diálogos', 'item/biblioteca/<?= $dado['instituicao_codigo']; ?>')">
+                        <a  class="social pointer" onclick="shareLink('facebook', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
                         <i class="cib-facebook-f"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('twitter', 'Diálogos', 'item/biblioteca/<?= $dado['instituicao_codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('twitter', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
                         <i class="cib-twitter"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('whatsapp', 'Diálogos', 'item/biblioteca/<?= $dado['instituicao_codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('whatsapp', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
                         <i class="cib-whatsapp"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('telegram', 'Diálogos', 'item/biblioteca/<?= $dado['instituicao_codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('telegram', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
                         <i class="cib-telegram"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('copy', 'Diálogos', 'item/biblioteca/<?= $dado['instituicao_codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('copy', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
                         <i class="cil-link"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('email', 'Diálogos', 'item/biblioteca/<?= $dado['instituicao_codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('email', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
                         <span class="material-symbols-outlined">mail</span>
                         </a>
                     </div>
@@ -134,6 +154,14 @@
                         <span>
                             <?= $dado['cutter_pha']; ?>
                         </span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($dado['categoria']) && !empty($dado['categoria'])): ?>
+                    <div class="single--details--info">
+                        <strong>Grupo/subgrupo<span class="tooltip-btn">+ <span class="tooltip">Primeira divisão de um fundo, constituída por documentos acumulados, reunidos por semelhança de função. Subdivisão de um grupo, utilizada em razão da complexidade estrutural ou funcional.</span></span></strong>
+
+                        <span><?= htmlspecialchars($dado['categoria']) ?><?= !empty($dado['subcategoria']) ? ' > ' . htmlspecialchars($dado['subcategoria']) : '' ?></span>
                     </div>
                     <?php endif; ?>
 

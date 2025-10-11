@@ -32,6 +32,20 @@
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
     <link rel="stylesheet" href="https://unpkg.com/@coreui/icons/css/all.min.css">
 
+    <?php if ($page == 'item'): ?>
+    <!-- Lightbox -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lightgallery.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.8.1/dist/css/justifiedGallery.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.4/css/lg-zoom.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.3/css/lg-fullscreen.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.0.0-beta.3/css/lg-thumbnail.css">
+    <?php endif; ?>
+
+    <?php if ($page == 'acervo'): ?>
+    <script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+    <?php endif; ?>
+
     <!-- Local -->
     <link rel="stylesheet" href="<?= INCLUDE_PATH; ?>assets/css/main.css">
 </head>
@@ -44,12 +58,22 @@
     <!-- Conteúdo -->
     <?php
         // Se existir um arquivo com o nome da primeira parte da URL
-        if (file_exists("pages/{$page}.php")) {
+        if (file_exists("pages/{$page}.php") && $page !== 'sobre') {
             include("pages/{$page}.php");
         } else {
-            // A página não existe
-            header('Location: ' . INCLUDE_PATH . '404');
-            exit;
+            // --- Busca os acervos para o filtro lateral ---
+            $sql = "SELECT * FROM sobre WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$page]);
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($data) {
+                include("pages/sobre.php");
+            } else {
+                // A página não existe
+                header('Location: ' . INCLUDE_PATH . '404');
+                exit;
+            }
         }
     ?>
     <!-- Fim Conteúdo -->

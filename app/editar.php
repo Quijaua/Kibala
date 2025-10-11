@@ -959,6 +959,25 @@ function toggle_detalhes(ps_campo)
 
 </script>
 
+<?php if ($vs_id_objeto_tela == 'sobre'): ?>
+
+<script>
+    $(function () {
+        $('#sobre_id').attr('placeholder', 'Ex.: sobre-projeto');
+    });
+</script>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('#sobre_conteudo').forEach(el => {
+            ClassicEditor.create(el).catch(console.error);
+        });
+    });
+</script>
+
+<?php endif; ?>
+
 </body>
 
 </html>

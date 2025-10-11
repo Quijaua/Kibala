@@ -69,8 +69,8 @@
                     d.codigo AS acervo_codigo,
                     d.identificador AS acervo_identificador,
                     d.nome AS acervo_nome,
-                    f.nome AS categoria,
-                    g.nome AS subcategoria
+                    f.nome AS subcategoria,
+                    g.nome AS categoria
                 FROM item_acervo a
                 INNER JOIN documento b ON a.codigo = b.item_acervo_codigo
                 LEFT JOIN livro c ON a.codigo = c.item_acervo_codigo
@@ -126,10 +126,10 @@
                             <strong>Grupo/Subgrupo</strong>
                             <span>
                                 <?php if (isset($dado['subcategoria']) && !empty($dado['subcategoria'])): ?>
-                                <?= $dado['subcategoria']; ?>
+                                <?= $dado['categoria']; ?>
                                 >
                                 <?php endif; ?>
-                                <?= $dado['categoria']; ?>
+                                <?= $dado['subcategoria']; ?>
                             </span>
                         </div>
                     </a>

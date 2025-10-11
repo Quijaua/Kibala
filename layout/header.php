@@ -1,3 +1,12 @@
+<?php
+    // --- Busca os acervos para o filtro lateral ---
+    $sql = "SELECT * FROM sobre ORDER BY titulo ASC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $paginas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+
 <header>
     <div class="container">
         <a href="<?= INCLUDE_PATH; ?>">
@@ -15,17 +24,19 @@
             <div href="sobre" class="menu__link --has-child">
                 <span>SOBRE <span class="icon material-symbols-outlined">expand_more</span></span>
                 <div class="submenu">
-                    <a href="sobre" class="menu__link">O projeto</a>
+                    <?php foreach ($paginas as $pagina): ?>
+                    <a href="<?= $pagina['id']; ?>" class="menu__link"><?= $pagina['nome']; ?></a>
+                    <?php endforeach; ?>
                     <a href="arranjo" class="menu__link">Arranjo</a>
                     <a href="biografia" class="menu__link">Biografia</a>
                     <a href="bibliografia" class="menu__link">Bibliografia</a>
-                    <a href="ficha-tecnica" class="menu__link">Ficha técnica</a>            
+                    <a href="ficha-tecnica" class="menu__link">Ficha técnica</a>
                 </div>
             </div>
 
             <div class="serach-mobile">
-                <form action="acervo.php" method="get" class="search">
-                    <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="">
+                <form action="acervo" method="get" class="search">
+                    <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="<?= $_GET['s'] ?? ""; ?>">
                     <button type="submit">
                     <span class="material-symbols-outlined">search</span>
                     </button>
@@ -33,8 +44,8 @@
             </div>
         </nav>
 
-        <form id="form_search" action="acervo.php" method="get" class="search">
-            <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="">
+        <form id="form_search" action="acervo" method="get" class="search">
+            <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="<?= $_GET['s'] ?? ""; ?>">
             <button type="submit">
                 <span class="material-symbols-outlined">search</span>
             </button>

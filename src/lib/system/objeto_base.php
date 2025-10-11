@@ -3447,9 +3447,108 @@ class objeto_base
 
     public function salvar($pa_valores, $pb_logar_operacao = true, $pn_idioma_codigo = 1, $pb_salvar_objeto_pai = true, $ps_id_objeto_filho = '', $pb_sobrescrever = true)
     {
+
         $this->banco_dados = $this->get_banco();
 
         $vb_iniciada_transacao = $this->iniciar_transacao();
+
+        // Não salvar dados duplicados
+        //////////////////////////////
+
+        if ($pa_valores['obj'] == 'sobre') {
+
+            function criar_id($texto) {
+                // 1. Remove espaços no início e no fim
+                $texto = trim($texto);
+
+                // 2. Passa para letras minúsculas
+                $texto = mb_strtolower($texto, 'UTF-8');
+
+                // 3. Remove acentos
+                $texto = preg_replace(
+                    '/[áàãâä]/u', 'a',
+                    $texto
+                );
+                $texto = preg_replace(
+                    '/[éèêë]/u', 'e',
+                    $texto
+                );
+                $texto = preg_replace(
+                    '/[íìîï]/u', 'i',
+                    $texto
+                );
+                $texto = preg_replace(
+                    '/[óòõôö]/u', 'o',
+                    $texto
+                );
+                $texto = preg_replace(
+                    '/[úùûü]/u', 'u',
+                    $texto
+                );
+                $texto = preg_replace(
+                    '/[ç]/u', 'c',
+                    $texto
+                );
+
+                // 4. Substitui qualquer caractere que não seja letra ou número por espaço
+                $texto = preg_replace('/[^a-z0-9]+/u', ' ', $texto);
+
+                // 5. Substitui espaços por hífen
+                $texto = preg_replace('/\s+/', '-', $texto);
+
+                // 6. Remove hífens duplicados
+                $texto = preg_replace('/-+/', '-', $texto);
+
+                // 7. Remove hífens do início e do fim
+                $texto = trim($texto, '-');
+
+                return $texto;
+            }
+
+            $ps_chave_primaria = "codigo";
+            $ps_tabela = $pa_valores['obj'];
+
+            $sobre_id = criar_id($pa_valores['sobre_id']);
+            $pa_valores['sobre_id'] = $sobre_id;
+
+            // Verifica se já existe uma página com o mesmo ID
+            $va_campos_select = ["codigo as codigo"];
+            $va_wheres_select = [$ps_tabela . ".id = (?)"];
+            $va_tipos_parametros_select = ["s"];
+            $va_parametros_select = [$pa_valores['sobre_id']];
+
+            // Se estiver em modo edição, ignora o próprio registro
+            if (isset($pa_valores['modo']) && $pa_valores['modo'] == 'edicao' && !empty($pa_valores['sobre_codigo'])) {
+                $va_wheres_select[] = "codigo != (?)";
+                $va_tipos_parametros_select[] = "i";
+                $va_parametros_select[] = $pa_valores['sobre_codigo'];
+            }
+
+            $va_selects[] = [
+                "tabela" => $ps_tabela,
+                "campos" => $va_campos_select,
+                "wheres" => $va_wheres_select,
+            ];
+
+            $vo_banco = $this->get_banco();
+            $resultado = $vo_banco->consultar($va_selects, $va_tipos_parametros_select, $va_parametros_select);
+
+            // Verifica se existe algum registro duplicado
+            if (count($resultado) > 0) {
+                echo "Já existe um registro com o mesmo ID. Escolha outro identificador.";
+                exit;
+            }
+
+            if ($pa_valores['sobre_id'] !== 'sobre') {
+                $caminho_arquivo = __DIR__ . "/../../../pages/{$pa_valores['sobre_id']}.php";
+                if (file_exists($caminho_arquivo)) {
+                    echo "Já existe um arquivo físico chamado '{$pa_valores['sobre_id']}.php'. Escolha outro ID.";
+                    exit;
+                }
+            }
+        }
+
+        ////////////////////////////////////////////////
 
         // Se existe objeto pai que precisa ser salvo
         /////////////////////////////////////////////

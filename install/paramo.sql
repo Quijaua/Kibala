@@ -4809,6 +4809,35 @@ INSERT INTO `setor_sistema_recurso_sistema` VALUES
 UNLOCK TABLES;
 
 --
+-- Table structure for table `sobre`
+--
+
+DROP TABLE IF EXISTS `sobre`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sobre` (
+  `codigo` int NOT NULL AUTO_INCREMENT,
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `nome` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `titulo` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `conteudo` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sobre`
+--
+
+LOCK TABLES `sobre` WRITE;
+/*!40000 ALTER TABLE `sobre` DISABLE KEYS */;
+INSERT INTO `sobre` VALUES
+(1,'sobre','O Projeto','Sobre o projeto','<p>A organização do acervo pessoal de Sueli Carneiro teve início em setembro de 2021 e segue em permanente constituição. É uma iniciativa da Casa Sueli Carneiro, em comum acordo com a ativista e intelectual, que gentilmente compartilhou os direitos de uso, digitalização e publicação de seu arquivo e de sua biblioteca pessoais. Ítens que estavam em sua antiga casa, na rua Professora Gioconda Mussolini, em São Paulo, atual sede da Casa Sueli Carneiro. O processo de organização foi também um processo de formação de profissionais negras em técnicas arquivísticas – e continua sendo. As principais características que o definem são:</p><ul><li>o respeito às decisões de Sueli Carneiro e seus familiares, detentores de direitos, sobre como e quais documentos e livros estarão disponíveis ao público;</li><li>a missão formativa de mulheres negras e periféricas na metodologia de organização do arquivo e da biblioteca aplicada neste projeto, para que estas, por sua vez, tenham condições de disseminarem o conhecimento adquirido em outros projetos de memória dos movimentos negros brasileiros;</li><li>o entendimento e o respeito às ciências da arquivologia e da biblioteconomia, com as adaptações necessárias e justificáveis às políticas de acervo da Casa Sueli Carneiro a possibilidade de acréscimo de  novos documentos e livros, com  constante revisão e incrementação de dados, mediante o recebimento de novas informações sobre seus itens constituintes, seja por parte dos detentores de direitos, ou do público consulente.</li></ul><p>O Acervo Sueli Carneiro preza pela independência e autonomia das documentalistas que nele trabalham, o que pode ser constatado em duas qualidades estruturais implementadas em seu  processo de organização. A primeira diz respeito à  tecnologia: a ferramenta online de gerenciamento do Acervo foi desenvolvida a partir de códigos abertos nas linguagens PHP e MySQL, de forma customizada, o que resultou numa interface intuitiva, de fácil usabilidade, capaz de incorporar novos arquivos e bibliotecas que porventura integrem os acervos da Casa Sueli Carneiro. Mais que isso, a Casa pretende ofertar, sempre que possível,  essa ferramenta de gerenciamento, que se chama Páramo, para outras entidades e coletivos organizados dos movimentos sociais negro e feminista; e nossas arquivistas poderão ser tutoras dos cursos desta  aplicação web para novas usuárias. </p><p>Em segundo lugar, a extroversão de nossa base de dados on-line – do gerenciador do acervo para este website em que estamos – é automatizada, ou seja, conforme nossa base de dados é alimentada, os novos itens aparecem imediatamente no website, tanto suas imagens como textos. Logo, há um espelhamento entre a base de dados e o website, cabendo às profissionais do acervo definirem, em comum acordo com a Casa e a titular do acervo, quando cada item catalogado poderá ser publicado. Com isso, arquivistas e bibliotecárias conseguem manejar os conteúdos do website como legítimas curadoras do Acervo, afinal são elas quem têm a mais intensa interação e conhecimento dos documentos, livros e periódicos que o constituem, numa relação por vezes tão íntima, nas raias dos detalhes inauditos, que as fazem ter mais vivas as informações neles contidas que a própria Sueli Carneiro.</p><p>Tratando ainda da extroversão do acervo, o projeto traz inovações na mediação com o público que, espera-se, consiga navegar intuitivamente neste website. Uma delas é a unificação para fins de busca dos itens do arquivo e da biblioteca, garantindo um resultado que permite relacionar livros e documentos que tratem do mesmo assunto, ou palavra-chave. Na prática, por exemplo, pode-se listar os <a href=\"https://casasuelicarneiro.org.br/sgpa3/front/acervo.php?s=L%C3%A9lia+Gonzalez\"><strong>documentos acumulados por Sueli Carneiro que contêm o nome de Lélia Gonzalez</strong></a> e ao mesmo tempo, na mesma lista, visualizar os livros escritos por e sobre a feminista que Sueli tenha guardado. Todavia, permite-se também a busca separada em <a href=\"https://casasuelicarneiro.org.br/sgpa3/front/acervo.php?secao=arquivo&amp;material=&amp;s=L%C3%A9lia+Gonzalez&amp;contexto=&amp;sort=data&amp;ord=asc&amp;pag=1&amp;acervo=1&amp;grupo=&amp;tit=&amp;ent=&amp;ai=&amp;af=&amp;paginf=2\"><strong>arquivo</strong></a> e <a href=\"https://casasuelicarneiro.org.br/sgpa3/front/acervo.php?secao=biblioteca&amp;material=&amp;s=&amp;contexto=&amp;sort=data&amp;ord=asc&amp;pag=1&amp;acervo=3&amp;grupo=&amp;serie=&amp;especie=&amp;tit=&amp;ent=&amp;ai=&amp;af=&amp;paginf=1\"><strong>biblioteca</strong></a>, conforme a necessidade do usuário, ressaltando que na base de dados também há integração do sistema de gerenciamento de ambos. </p><p>Outra aposta inovadora são as exposições virtuais, com curadoria e textos de navegação executados pelas documentalistas, reiterando o conhecimento profundo do acervo que elas possuem, como citado anteriormente. São exposições de assuntos que elas julgam interessantes, que surgem a partir da convivência cotidiana que têm com os livros e documentos, com recortes temáticos que focam uma atividade desenvolvida por Sueli, vide <a href=\"https://casasuelicarneiro.org.br/sgpa3/front/exposicao-virtual/atuacao-no-correio-braziliense\"><strong>Atuação no Correio Braziliense</strong></a>, ou algo inesperado como o fato Sueli foi ao<strong> </strong><a href=\"https://casasuelicarneiro.org.br/sgpa3/front/exposicao-virtual/sueli-foi-ao-rock-in-rio-em-2001\"><strong>Rock in Rio 2001</strong></a>. Elas não têm tamanho, formato, nem periodicidade pré-determinados, mas devem surgir sempre que uma pesquisa ou trabalho em andamento incitar uma ideia e almejam ativar a visitação do acervo e o compartilhamento de conhecimento.</p><p>Por fim, além da guarda e exibição do Acervo Sueli Carneiro, nos propomos a manter um diálogo permanente com a sociedade para criarmos juntos o futuro deste centro de memória que deve estar atento e preparado para os desafios porvir. </p><p>Bem-vindes!</p>');
+/*!40000 ALTER TABLE `sobre` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `status_item_acervo`
 --
 
