@@ -9,7 +9,7 @@
             GROUP BY id
         ) AS latest
         ON s.id = latest.id AND s.codigo = latest.max_codigo
-        ORDER BY s.titulo ASC
+        ORDER BY s.codigo ASC
     ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
@@ -36,8 +36,6 @@
                     <?php foreach ($paginas as $pagina): ?>
                     <a href="<?= $pagina['id']; ?>" class="menu__link"><?= $pagina['nome']; ?></a>
                     <?php endforeach; ?>
-                    <a href="arranjo" class="menu__link">Arranjo</a>
-                    <a href="bibliografia" class="menu__link">Bibliografia</a>
                 </div>
             </div>
 
