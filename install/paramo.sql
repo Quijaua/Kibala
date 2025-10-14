@@ -3121,6 +3121,34 @@ LOCK TABLES `item_acervo_suporte` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `linha_tempo`
+--
+
+DROP TABLE IF EXISTS `linha_tempo`;
+CREATE TABLE `linha_tempo` (
+  `codigo` int NOT NULL AUTO_INCREMENT,
+  `id` varchar(255) DEFAULT NULL,
+  `titulo` varchar(255) DEFAULT NULL,
+  `data_inicial` date DEFAULT NULL,
+  `data_final` date DEFAULT NULL,
+  `data_presumida` tinyint(1) DEFAULT NULL,
+  `sem_data` tinyint(1) DEFAULT NULL,
+  `descricao` text,
+  PRIMARY KEY (`codigo`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `linha_tempo`
+--
+
+LOCK TABLES `linha_tempo` WRITE;
+/*!40000 ALTER TABLE `linha_tempo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `linha_tempo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `livro`
 --
 

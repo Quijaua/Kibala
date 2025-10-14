@@ -41,7 +41,7 @@ return [
     # Cada seção é composta por um array de classes do sistema.
     "sidebar" => [
         "institucional" => [
-            "conjunto_documental", "biblioteca", "instituicao", "tipo_material", "unidade_armazenamento", "sobre"
+            "conjunto_documental", "biblioteca", "instituicao", "tipo_material", "unidade_armazenamento", "sobre", "linha_tempo"
         ],
         "permissoes" => [
             "grupo_usuario", "usuario"
