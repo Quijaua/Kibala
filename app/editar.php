@@ -962,6 +962,28 @@ function toggle_detalhes(ps_campo)
 <?php if ($vs_id_objeto_tela == 'sobre'): ?>
 
 <script>
+    $(document).ready(function () {
+        const checkbox = $('input[name="sobre_ativar_acervo_chk"]');
+        const campoAcervo = $('#div_sobre_acervo_codigo');
+
+        // Oculta o campo no carregamento
+        if (!checkbox.is(':checked')) {
+            campoAcervo.hide();
+        }
+
+        // Mostra ou oculta conforme o checkbox
+        checkbox.on('change', function () {
+            if (this.checked) {
+                campoAcervo.fadeIn();
+            } else {
+                campoAcervo.fadeOut();
+                $('select[name="sobre_acervo_codigo"]').val('');
+            }
+        });
+    });
+</script>
+
+<script>
     $(function () {
         $('#sobre_id').attr('placeholder', 'Ex.: sobre-projeto');
     });
@@ -971,6 +993,19 @@ function toggle_detalhes(ps_campo)
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         document.querySelectorAll('#sobre_conteudo').forEach(el => {
+            ClassicEditor.create(el).catch(console.error);
+        });
+    });
+</script>
+
+<?php endif; ?>
+
+<?php if ($vs_id_objeto_tela == 'linha_tempo'): ?>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.3.1/classic/ckeditor.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('#linha_tempo_descricao').forEach(el => {
             ClassicEditor.create(el).catch(console.error);
         });
     });

@@ -61,11 +61,31 @@
         if (file_exists("pages/{$page}.php") && $page !== 'sobre') {
             include("pages/{$page}.php");
         } else {
-            // --- Busca os acervos para o filtro lateral ---
-            $sql = "SELECT * FROM sobre WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([$page]);
-            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            $acervo_s = $_GET['s'] ?? ''; // parâmetro ?s=, se existir
+
+            if (!empty($acervo_s)) {
+                // --- Busca o acervo pelo nome (primeira palavra) ---
+                $acervo_s = strtolower(trim($acervo_s));
+
+                $sql = "
+                    SELECT s.*
+                    FROM sobre s
+                    INNER JOIN acervo a ON a.codigo = s.acervo_codigo
+                    WHERE s.id = ?
+                    AND LOWER(SUBSTRING_INDEX(a.nome, ' ', 1)) = ?
+                    LIMIT 1
+                ";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$page, $acervo_s]);
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            } else {
+                // --- Caso não tenha ?s=, busca a primeira página da sobre ---
+                $sql = "SELECT * FROM sobre WHERE id = ? ORDER BY codigo ASC LIMIT 1";
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([$page]);
+                $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            }
 
             if ($data) {
                 include("pages/sobre.php");

@@ -3055,6 +3055,25 @@ footer .bottom .list-social .social:hover {
     font-family: "Open Sans", sans-serif;
 }
 
+.arranjo-content .interno--title.--active,
+.bibliografia-content .interno--title.--active {
+  display: none;
+}
+
+.bibliografia-content h2 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    -moz-column-gap: 20px;
+    column-gap: 20px;
+    font-size: 26px;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--color-highlight);
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
 .bibliografia-content p {
     padding-bottom: 30px !important;
     margin-bottom: 30px !important;

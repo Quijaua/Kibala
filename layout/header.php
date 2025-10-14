@@ -1,7 +1,16 @@
 <?php
     // --- Busca os acervos para o filtro lateral ---
-    $sql = "SELECT * FROM sobre ORDER BY titulo ASC";
-
+    $sql = "
+        SELECT s.*
+        FROM sobre s
+        INNER JOIN (
+            SELECT id, MAX(codigo) AS max_codigo
+            FROM sobre
+            GROUP BY id
+        ) AS latest
+        ON s.id = latest.id AND s.codigo = latest.max_codigo
+        ORDER BY s.titulo ASC
+    ";
     $stmt = $conn->prepare($sql);
     $stmt->execute();
     $paginas = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -28,15 +37,13 @@
                     <a href="<?= $pagina['id']; ?>" class="menu__link"><?= $pagina['nome']; ?></a>
                     <?php endforeach; ?>
                     <a href="arranjo" class="menu__link">Arranjo</a>
-                    <a href="biografia" class="menu__link">Biografia</a>
                     <a href="bibliografia" class="menu__link">Bibliografia</a>
-                    <a href="ficha-tecnica" class="menu__link">Ficha técnica</a>
                 </div>
             </div>
 
             <div class="serach-mobile">
                 <form action="acervo" method="get" class="search">
-                    <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="<?= $_GET['s'] ?? ""; ?>">
+                    <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="<?= $page == 'acervo' && isset($_GET['s']) ? $_GET['s'] : ""; ?>">
                     <button type="submit">
                     <span class="material-symbols-outlined">search</span>
                     </button>
@@ -45,7 +52,7 @@
         </nav>
 
         <form id="form_search" action="acervo" method="get" class="search">
-            <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="<?= $_GET['s'] ?? ""; ?>">
+            <input type="search" name="s" id="search" placeholder="Busca" autocomplete="off" value="<?= $page == 'acervo' && isset($_GET['s']) ? $_GET['s'] : ""; ?>">
             <button type="submit">
                 <span class="material-symbols-outlined">search</span>
             </button>

@@ -100,7 +100,7 @@
                 <?php foreach ($documentos as $dado): ?>
 
                     <?php
-                        $dado['imagem'] = (isset($dado['imagem_base64']) && !empty($dado['imagem_base64'])) ? "data:image/png;base64,{$dado['imagem_base64']}" : INCLUDE_PATH . "assets/img/sem-imagem.png";    
+                        $dado['imagem'] = (isset($dado['imagem_base64']) && !empty($dado['imagem_base64'])) ? "data:image/png;base64,{$dado['imagem_base64']}" : INCLUDE_PATH . "assets/img/sem-imagem.png";
                     ?>
 
                     <!-- ===== HTML do card ===== -->

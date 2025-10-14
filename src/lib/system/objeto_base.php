@@ -3458,50 +3458,18 @@ class objeto_base
         if ($pa_valores['obj'] == 'sobre') {
 
             function criar_id($texto) {
-                // 1. Remove espaços no início e no fim
                 $texto = trim($texto);
-
-                // 2. Passa para letras minúsculas
                 $texto = mb_strtolower($texto, 'UTF-8');
-
-                // 3. Remove acentos
-                $texto = preg_replace(
-                    '/[áàãâä]/u', 'a',
-                    $texto
-                );
-                $texto = preg_replace(
-                    '/[éèêë]/u', 'e',
-                    $texto
-                );
-                $texto = preg_replace(
-                    '/[íìîï]/u', 'i',
-                    $texto
-                );
-                $texto = preg_replace(
-                    '/[óòõôö]/u', 'o',
-                    $texto
-                );
-                $texto = preg_replace(
-                    '/[úùûü]/u', 'u',
-                    $texto
-                );
-                $texto = preg_replace(
-                    '/[ç]/u', 'c',
-                    $texto
-                );
-
-                // 4. Substitui qualquer caractere que não seja letra ou número por espaço
+                $texto = preg_replace('/[áàãâä]/u', 'a', $texto);
+                $texto = preg_replace('/[éèêë]/u', 'e', $texto);
+                $texto = preg_replace('/[íìîï]/u', 'i', $texto);
+                $texto = preg_replace('/[óòõôö]/u', 'o', $texto);
+                $texto = preg_replace('/[úùûü]/u', 'u', $texto);
+                $texto = preg_replace('/[ç]/u', 'c', $texto);
                 $texto = preg_replace('/[^a-z0-9]+/u', ' ', $texto);
-
-                // 5. Substitui espaços por hífen
                 $texto = preg_replace('/\s+/', '-', $texto);
-
-                // 6. Remove hífens duplicados
                 $texto = preg_replace('/-+/', '-', $texto);
-
-                // 7. Remove hífens do início e do fim
                 $texto = trim($texto, '-');
-
                 return $texto;
             }
 
@@ -3511,32 +3479,64 @@ class objeto_base
             $sobre_id = criar_id($pa_valores['sobre_id']);
             $pa_valores['sobre_id'] = $sobre_id;
 
-            // Verifica se já existe uma página com o mesmo ID
-            $va_campos_select = ["codigo as codigo"];
-            $va_wheres_select = [$ps_tabela . ".id = (?)"];
-            $va_tipos_parametros_select = ["s"];
-            $va_parametros_select = [$pa_valores['sobre_id']];
-
-            // Se estiver em modo edição, ignora o próprio registro
-            if (isset($pa_valores['modo']) && $pa_valores['modo'] == 'edicao' && !empty($pa_valores['sobre_codigo'])) {
-                $va_wheres_select[] = "codigo != (?)";
-                $va_tipos_parametros_select[] = "i";
-                $va_parametros_select[] = $pa_valores['sobre_codigo'];
-            }
-
-            $va_selects[] = [
-                "tabela" => $ps_tabela,
-                "campos" => $va_campos_select,
-                "wheres" => $va_wheres_select,
-            ];
-
             $vo_banco = $this->get_banco();
-            $resultado = $vo_banco->consultar($va_selects, $va_tipos_parametros_select, $va_parametros_select);
 
-            // Verifica se existe algum registro duplicado
-            if (count($resultado) > 0) {
-                echo "Já existe um registro com o mesmo ID. Escolha outro identificador.";
-                exit;
+            // Se o ativar_acervo for 1, a regra muda
+            if (!empty($pa_valores['sobre_ativar_acervo']) && $pa_valores['sobre_ativar_acervo'] == 1) {
+                // Vamos permitir IDs repetidos, mas NÃO se forem do mesmo acervo
+                $va_campos_select = ["codigo as codigo"];
+                $va_wheres_select = [
+                    $ps_tabela . ".id = (?)",
+                    $ps_tabela . ".acervo_codigo = (?)"
+                ];
+                $va_tipos_parametros_select = ["s", "i"];
+                $va_parametros_select = [$pa_valores['sobre_id'], $pa_valores['sobre_acervo_codigo']];
+
+                // Ignora o próprio registro se estiver editando
+                if (isset($pa_valores['modo']) && $pa_valores['modo'] == 'edicao' && !empty($pa_valores['sobre_codigo'])) {
+                    $va_wheres_select[] = "codigo != (?)";
+                    $va_tipos_parametros_select[] = "i";
+                    $va_parametros_select[] = $pa_valores['sobre_codigo'];
+                }
+
+                $va_selects[] = [
+                    "tabela" => $ps_tabela,
+                    "campos" => $va_campos_select,
+                    "wheres" => $va_wheres_select,
+                ];
+
+                $resultado = $vo_banco->consultar($va_selects, $va_tipos_parametros_select, $va_parametros_select);
+
+                if (count($resultado) > 0) {
+                    echo "Já existe uma página com o mesmo ID e o mesmo acervo. Escolha outro ID ou altere o acervo.";
+                    exit;
+                }
+
+            } else {
+                // Validação padrão (sem acervo ativo)
+                $va_campos_select = ["codigo as codigo"];
+                $va_wheres_select = [$ps_tabela . ".id = (?)"];
+                $va_tipos_parametros_select = ["s"];
+                $va_parametros_select = [$pa_valores['sobre_id']];
+
+                if (isset($pa_valores['modo']) && $pa_valores['modo'] == 'edicao' && !empty($pa_valores['sobre_codigo'])) {
+                    $va_wheres_select[] = "codigo != (?)";
+                    $va_tipos_parametros_select[] = "i";
+                    $va_parametros_select[] = $pa_valores['sobre_codigo'];
+                }
+
+                $va_selects[] = [
+                    "tabela" => $ps_tabela,
+                    "campos" => $va_campos_select,
+                    "wheres" => $va_wheres_select,
+                ];
+
+                $resultado = $vo_banco->consultar($va_selects, $va_tipos_parametros_select, $va_parametros_select);
+
+                if (count($resultado) > 0) {
+                    echo "Já existe um registro com o mesmo ID. Escolha outro identificador.";
+                    exit;
+                }
             }
 
             if ($pa_valores['sobre_id'] !== 'sobre') {

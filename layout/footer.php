@@ -5,7 +5,7 @@
             <div class="content">
                 <h2 class="title">A Casa Sueli Carneiro é um espaço de memória, formação e ativismo negro</h2>
                 <p class="descricao">Saiba mais sobre a Casa Sueli Carneiro em nosso site</p>
-                <a href="https://casasuelicarneiro.org.br/" target="_blank" class="button">Acesse o site</a>
+                <a href="<?= INCLUDE_PATH; ?>" target="_blank" class="button">Acesse o site</a>
             </div>
         </div>
     </div>
