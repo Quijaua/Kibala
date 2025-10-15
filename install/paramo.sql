@@ -3149,6 +3149,31 @@ LOCK TABLES `linha_tempo` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `linha_tempo_item_acervo`
+--
+
+DROP TABLE IF EXISTS `linha_tempo_item_acervo`;
+CREATE TABLE `linha_tempo_item_acervo` (
+  `linha_tempo_codigo` int NOT NULL,
+  `item_acervo_codigo` int NOT NULL,
+  `sequencia` int DEFAULT NULL,
+  PRIMARY KEY (`linha_tempo_codigo`,`item_acervo_codigo`),
+  KEY `linha_tempo_item_acervo_FK_1` (`item_acervo_codigo`),
+  CONSTRAINT `linha_tempo_item_acervo_FK` FOREIGN KEY (`linha_tempo_codigo`) REFERENCES `linha_tempo` (`codigo`),
+  CONSTRAINT `linha_tempo_item_acervo_FK_1` FOREIGN KEY (`item_acervo_codigo`) REFERENCES `item_acervo` (`codigo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `linha_tempo_item_acervo`
+--
+
+LOCK TABLES `linha_tempo_item_acervo` WRITE;
+/*!40000 ALTER TABLE `linha_tempo_item_acervo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `linha_tempo_item_acervo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `livro`
 --
 
