@@ -249,7 +249,7 @@ public function recuperar_senha($pn_usuario_codigo, $ps_usuario_email, $ps_usuar
 
     $vs_message = "<p>Olá, " . $ps_usuario_nome . "</p>";
 
-    $vs_message .= "<p>Uma solicitação para redefinir sua senha de acesso ao sistema Páramo foi recebida.</p>";
+    $vs_message .= "<p>Uma solicitação para redefinir sua senha de acesso ao sistema Kibala foi recebida.</p>";
     $vs_message .= "<p>Para acessar o sistema, utilize a senha provisória abaixo:</p>";
     $vs_message .= "<p><b>" . $vs_nova_senha . "</b></p>";
 
@@ -260,7 +260,7 @@ public function recuperar_senha($pn_usuario_codigo, $ps_usuario_email, $ps_usuar
     return utils::send_email(
         $ps_usuario_email,
         $ps_usuario_nome,
-        "[Páramo] Recuperar senha",
+        "[Kibala] Recuperar senha",
         $vs_message
     );
 

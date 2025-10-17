@@ -9,7 +9,7 @@ const RECOMMENDED_EXTENSIONS = ["imagick", "zlib"];
 const INSTALLATION_STEPS = ["REQUIREMENTS" => 1, "DATABASE" => 2, "CONFIGURATION" => 3, "CONFIRMATION" => 4, "FINISH" => 5];
 const POST_VARIABLES = [
     "script" => ["step"],
-    "database" => ["db_host", "db_create", "db_name", "db_user", "db_password", "db_overwrite"],
+    "database" => ["db_host", "db_create", "db_name", "db_user", "db_password", "db_overwrite", "institution_url"],
     "configuration" => ["institution_name", "admin_login", "admin_email", "admin_password"]
 ];
 const MESSAGES = [
@@ -20,7 +20,7 @@ const MESSAGES = [
         ],
         "ERROR" => [
             "TYPE" => "danger",
-            "MESSAGE" => "Não foi possível descompactar os arquivos. Verifique as permissões de escrita da pasta do sistema (<strong>paramo</strong>)."
+            "MESSAGE" => "Não foi possível descompactar os arquivos. Verifique as permissões de escrita da pasta do sistema (<strong>kibala</strong>)."
         ]
     ],
     "REQUIREMENTS" => [
@@ -128,7 +128,7 @@ const MESSAGES = [
     ]
 ];
 
-define("DATABASE_PATH", dirname(__FILE__) . "/paramo.sql");
+define("DATABASE_PATH", dirname(__FILE__) . "/kibala.sql");
 define("ASSETS_FOLDER", dirname(__FILE__) . "/../app/assets/custom/");
 define("MEDIA_FOLDER", dirname(__FILE__) . "/../app/media/");
 define("CONFIG_FOLDER", dirname(__FILE__) . "/../config/");
@@ -214,14 +214,14 @@ function get_html_page(string $active_tab, string $tab_content): void
     $html .= '<html lang="pt-br">';
     $html .= '<head>';
     $html .= '<meta charset="UTF-8">';
-    $html .= '<title>Páramo | Instalação</title>';
+    $html .= '<title>Kibala | Instalação</title>';
     $html .= '<link rel="stylesheet" href="' . '../app/assets/css/style.css">';
     $html .= '</head>';
     $html .= '<body>';
     $html .= '<div class="container mt-5">';
     $html .= '<div class="row">';
     $html .= '<div class="col-md-12">';
-    $html .= '<h1>Páramo - Instalação</h1>';
+    $html .= '<h1>Kibala - Instalação</h1>';
 
     $html .= get_nav_tabs($active_tab);
 
@@ -1056,6 +1056,7 @@ function create_custom_config(): bool
     $envs_example_file = str_replace("REPLACE_NAME", escape_chars($post_values["db_name"]), $envs_example_file);
     $envs_example_file = str_replace("REPLACE_USER", escape_chars($post_values["db_user"]), $envs_example_file);
     $envs_example_file = str_replace("REPLACE_PASSWORD", escape_chars($post_values["db_password"]), $envs_example_file);
+    $envs_example_file = str_replace("REPLACE_INSTITUTION_URL", escape_chars($post_values["institution_url"]), $envs_example_file);
     $envs_file_path = CONFIG_FOLDER . "/custom/envs.php";
 
     if (!file_exists($envs_file_path))
@@ -1114,7 +1115,7 @@ function get_input_field_parameters(): array
 
         "db_name" => [
             "label" => "Nome do banco de dados",
-            "placeholder" => "Ex: paramo ou a123456_paramo",
+            "placeholder" => "Ex: kibala ou a123456_kibala",
             "value" => htmlspecialchars($post_values["db_name"]),
             "required" => true,
             "type" => "text"
@@ -1122,7 +1123,7 @@ function get_input_field_parameters(): array
 
         "db_user" => [
             "label" => "Usuário do banco de dados",
-            "placeholder" => "Ex: paramo ou a123456_paramo",
+            "placeholder" => "Ex: kibala ou a123456_kibala",
             "value" => htmlspecialchars($post_values["db_user"]),
             "required" => true,
             "type" => "text"
@@ -1144,9 +1145,17 @@ function get_input_field_parameters(): array
             "type" => "radio"
         ],
 
+        "institution_url" => [
+            "label" => "URL da instituição",
+            "placeholder" => "Ex: https://kibala.com.br/",
+            "value" => htmlspecialchars($post_values["institution_url"]),
+            "required" => true,
+            "type" => "text"
+        ],
+
         "institution_name" => [
             "label" => "Nome da instituição",
-            "placeholder" => "Ex: Páramo - Sistema de Gereciamento de Acervos",
+            "placeholder" => "Ex: Kibala - Sistema de Gereciamento de Acervos",
             "value" => htmlspecialchars($post_values["institution_name"]),
             "required" => true,
             "type" => "text"

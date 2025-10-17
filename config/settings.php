@@ -24,7 +24,7 @@ return [
 
     # ================================================ PERSONALIZAÇÃO ================================================ #
 
-    "nome_instituicao" => "Páramo",
+    "nome_instituicao" => "Kibala",
 
     # A descrição da instituição é exibida na página de login
     "descricao_instituicao" => "",

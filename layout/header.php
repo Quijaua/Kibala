@@ -27,14 +27,14 @@
         </a>
         <span class="menu-btn material-symbols-outlined">menu</span>
         <nav class="menu">
-            <a href="acervo" class="menu__link">Acervo</a>
-            <a href="exposicoes-virtuais" class="menu__link">EXPOSIÇÕES VIRTUAIS</a>
-            <a href="linha-do-tempo" class="menu__link">LINHA DO TEMPO</a>
+            <a href="<?= INCLUDE_PATH; ?>acervo" class="menu__link">Acervo</a>
+            <a href="<?= INCLUDE_PATH; ?>" class="menu__link">EXPOSIÇÕES VIRTUAIS</a>
+            <a href="<?= INCLUDE_PATH; ?>linha-do-tempo" class="menu__link">LINHA DO TEMPO</a>
             <div href="sobre" class="menu__link --has-child">
                 <span>SOBRE <span class="icon material-symbols-outlined">expand_more</span></span>
                 <div class="submenu">
                     <?php foreach ($paginas as $pagina): ?>
-                    <a href="<?= $pagina['id']; ?>" class="menu__link"><?= $pagina['nome']; ?></a>
+                    <a href="<?= INCLUDE_PATH . $pagina['id']; ?>" class="menu__link"><?= $pagina['nome']; ?></a>
                     <?php endforeach; ?>
                 </div>
             </div>

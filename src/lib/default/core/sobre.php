@@ -9,6 +9,7 @@ class sobre extends entidade
         $this->tabela_banco = $this->inicializar_tabela_banco();
         $this->chave_primaria = $this->inicializar_chave_primaria();
         $this->atributos = $this->inicializar_atributos();
+        $this->relacionamentos = $this->inicializar_relacionamentos();
         $this->inicializar_visualizacoes();
     }
 
@@ -134,6 +135,7 @@ class sobre extends entidade
     public function inicializar_filtros_navegacao($pn_bibliografia_codigo = '')
     {
         $va_filtros_navegacao = array();
+        parent::inicializar_filtros_navegacao($pn_bibliografia_codigo);
 
         $va_filtros_navegacao["sobre_acervo_codigo_0_acervo_instituicao_codigo"] = [
             "html_combo_input",
@@ -189,12 +191,13 @@ class sobre extends entidade
             "css-class" => "form-select"
         ];
 
-        return $va_filtros_navegacao;
+        return array_merge($va_filtros_navegacao, $this->filtros_navegacao);
     }
 
     public function inicializar_visualizacoes()
     {
         $va_campos_visualizacao = array();
+        parent::inicializar_visualizacoes();
 
         $va_campos_visualizacao["sobre_codigo"] = ["nome" => "sobre_codigo", "exibir" => false];
         $va_campos_visualizacao["sobre_nome"] = ["nome" => "sobre_nome"];
@@ -209,17 +212,17 @@ class sobre extends entidade
             "formato" => ["campo" => "acervo_nome"]
         ];
 
-        $this->visualizacoes["lista"]["campos"] = $va_campos_visualizacao;
+        $this->visualizacoes["lista"]["campos"] = array_merge($this->visualizacoes["lista"]["campos"], $va_campos_visualizacao);
         $this->visualizacoes["lista"]["order_by"] = ["sobre_nome" => "Nome"];
 
-        $this->visualizacoes["navegacao"]["campos"] = $va_campos_visualizacao;
+        $this->visualizacoes["navegacao"]["campos"] = array_merge($va_campos_visualizacao, $this->visualizacoes["navegacao"]["campos"]);
         $this->visualizacoes["navegacao"]["order_by"] = ["sobre_nome" => "Nome"];
         $this->visualizacoes["navegacao"]["ordem_campos"] = [
             "sobre_nome" => ["label" => "Nome", "main_field" => true],
             "sobre_acervo_codigo" => "Fundo/Coleção"
         ];
 
-        $this->visualizacoes["ficha"]["campos"] = $va_campos_visualizacao;
+        $this->visualizacoes["ficha"]["campos"] = array_merge($va_campos_visualizacao, $this->visualizacoes["ficha"]["campos"]);
         $this->visualizacoes["ficha"]["ordem_campos"] = [
             "sobre_nome" => ["label" => "Nome", "main_field" => true],
             "sobre_titulo" => ["label" => "Título"],

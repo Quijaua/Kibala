@@ -19,4 +19,5 @@
         // echo "Erro: Conexão com banco de dados não realizado com sucesso. Erro gerado " . $err->getMessage();
     }
 
-    define('INCLUDE_PATH', 'http://localhost/rafael-vindi/paramo/');
+    define('INCLUDE_PATH', $config['institution_url']);
+    define('INCLUDE_FILE_PATH', INCLUDE_PATH . 'app/functions/serve_file.php');

@@ -1,4 +1,8 @@
 <?php
+    // Limpa o parâmetro recebido (ex: asc_000123 → 000123)
+    $codigo = $param;
+    $param = preg_replace('/\D+/', '', $param);
+
     $sql = "SELECT
                 a.*,
                 b.codigo AS codigo_livro,
@@ -82,7 +86,7 @@
     <div class="single--top --livro">
         <h1 class="title">
 			<?= $dado['identificador']; ?>
-            <span><?= $dado['codigo']; ?></span>
+            <span><?= $codigo ?></span>
 		</h1>
 
         <div class="breadcrumb">
@@ -102,7 +106,7 @@
             <a href="<?= INCLUDE_PATH; ?>acervo?acervo=<?= $dado['acervo_codigo']; ?>" title="<?= $dado['subcategoria']; ?>" class="breadcrumb--link"><?= $dado['subcategoria']; ?></a>
             <a class='breadcrumb--link'> / </a>
             <?php endif; ?>
-            <a href="#" class="breadcrumb--link"><?= $dado['codigo']; ?></a>
+            <a href="#" class="breadcrumb--link"><?= $codigo ?></a>
         </div>
     </div>
 
@@ -124,22 +128,22 @@
 
                 <div class="single--details">
                     <div class="single--details--list-social">
-                        <a  class="social pointer" onclick="shareLink('facebook', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
+                        <a  class="social pointer" onclick="shareLink('facebook', 'Diálogos', 'item/biblioteca/<?= $codigo ?>')">
                         <i class="cib-facebook-f"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('twitter', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('twitter', 'Diálogos', 'item/biblioteca/<?= $codigo ?>')">
                         <i class="cib-twitter"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('whatsapp', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('whatsapp', 'Diálogos', 'item/biblioteca/<?= $codigo ?>')">
                         <i class="cib-whatsapp"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('telegram', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('telegram', 'Diálogos', 'item/biblioteca/<?= $codigo ?>')">
                         <i class="cib-telegram"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('copy', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('copy', 'Diálogos', 'item/biblioteca/<?= $codigo ?>')">
                         <i class="cil-link"></i>
                         </a>
-                        <a class="social pointer" onclick="shareLink('email', 'Diálogos', 'item/biblioteca/<?= $dado['codigo']; ?>')">
+                        <a class="social pointer" onclick="shareLink('email', 'Diálogos', 'item/biblioteca/<?= $codigo ?>')">
                         <span class="material-symbols-outlined">mail</span>
                         </a>
                     </div>

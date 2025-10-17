@@ -2,7 +2,8 @@
 RewriteEngine On
 
 # Define o diretório base do seu projeto
-RewriteBase /paramo/
+# Funciona na raiz (ex: /) e em subpastas (ex: /kibala/, /kibala/teste/, etc.)
+RewriteBase /
 
 # Se o arquivo ou diretório não existir fisicamente, redireciona para index.php
 RewriteCond %{REQUEST_FILENAME} !-f

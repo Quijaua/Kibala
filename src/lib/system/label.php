@@ -182,7 +182,7 @@ class label extends FPDF2File
     {
         $this->SetTitle($this->encode($this->vs_title));
         $this->SetAuthor($this->encode(config::get(["nome_instituicao"])));
-        $this->SetCreator($this->encode("Páramo"));
+        $this->SetCreator($this->encode("Kibala"));
         $this->SetSubject($this->encode($this->vs_title));
         $this->SetKeywords($this->encode($this->vs_title));
     }

@@ -5,6 +5,9 @@ $pagina_atual = isset($_GET['pag']) && $_GET['pag'] > 0 ? (int)$_GET['pag'] : 1;
 $offset = ($pagina_atual - 1) * $itens_por_pagina;
 
 // --- Ordenação ---
+$acervo = strtolower($_GET['acervo'] ?? '');
+$secao = strtolower($_GET['secao'] ?? '');
+$grupo = strtolower($_GET['grupo'] ?? '');
 $sort = strtolower($_GET['sort'] ?? 'data');
 $ord = strtolower($_GET['ord'] ?? 'asc');
 $ord = ($ord === 'desc') ? 'desc' : 'asc';
@@ -24,6 +27,48 @@ $joins = "";
 if (!empty($_GET['acervo'])) {
     $filtros[] = 'a.acervo_codigo = :acervo';
     $params[':acervo'] = $_GET['acervo'];
+}
+
+// Filtro por grupo
+if (!empty($_GET['grupo'])) {
+    $sql = "SELECT codigo FROM agrupamento WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['grupo']]);
+    $grupo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $joins .= "
+        LEFT JOIN documento doc ON a.codigo = doc.item_acervo_codigo
+        LEFT JOIN agrupamento agrup ON doc.agrupamento_codigo = agrup.codigo
+        LEFT JOIN agrupamento_dados_textuais agrup_text ON doc.agrupamento_codigo = agrup_text.agrupamento_codigo
+    ";
+    $filtros[] = '(agrup_text.agrupamento_codigo = :grupo OR agrup.agrupamento_superior_codigo = :grupo)';
+    $params[':grupo'] = $grupo['codigo'];
+}
+
+// Filtro por grupo
+if (!empty($_GET['subgrupo'])) {
+    $sql = "SELECT codigo FROM agrupamento WHERE id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$_GET['subgrupo']]);
+    $subgrupo = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $joins .= "
+        LEFT JOIN documento doc ON a.codigo = doc.item_acervo_codigo
+        LEFT JOIN agrupamento agrup ON doc.agrupamento_codigo = agrup.codigo
+        LEFT JOIN agrupamento_dados_textuais agrup_text ON doc.agrupamento_codigo = agrup_text.agrupamento_codigo
+    ";
+    $filtros[] = 'agrup_text.agrupamento_codigo = :subgrupo';
+    $params[':subgrupo'] = $subgrupo['codigo'];
+}
+
+// Filtro por título/descrição
+if (!empty($_GET['especie'])) {
+    $joins .= "
+        LEFT JOIN documento doc1 ON a.codigo = doc1.item_acervo_codigo
+        LEFT JOIN documento_especie_documental especie ON doc1.codigo = especie.documento_codigo
+    ";
+    $filtros[] = 'especie.especie_documental_codigo = :especie';
+    $params[':especie'] = $_GET['especie'];
 }
 
 // Filtro por título/descrição
@@ -89,6 +134,7 @@ $sql = "SELECT DISTINCT
             d.codigo AS acervo_codigo,
             d.identificador AS acervo_identificador,
             d.nome AS acervo_nome,
+            d.sigla AS acervo_sigla,
             f.nome AS subcategoria,
             g.nome AS categoria
         FROM item_acervo a
@@ -131,57 +177,133 @@ $acervos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <main class="page-acervo">
-        <section class="section-default">
-
-                            <div class="topo">
-                    <div class="container">
-                        <div class="info">
-                            <h2 class="title">Acervo</h2>
-
-                            <div class="breadcrumb --default">
-                            <a href="./" title="Home" class="breadcrumb--link">Home</a><a class='breadcrumb--link'> / </a><a href="acervo" title="Explore" class="breadcrumb--link">Explore</a>                            </div>
-                        </div>
+    <section class="section-default">
+        <div class="topo">
+            <div class="container">
+                <div class="info">
+                    <h2 class="title">Acervo</h2>
+                    <div class="breadcrumb --default">
+                        <a href="./" title="Home" class="breadcrumb--link">Home</a><a class='breadcrumb--link'> / </a><a href="acervo" title="Explore" class="breadcrumb--link">Explore</a>
                     </div>
-                </div>            
-
-                <div class="container">
-                    <div class="categorys-holder">
-                        <div class="category-content">
-                                                    
-
-                            <strong class="category-title" title="arquivo">Arquivo Sueli Carneiro</strong>                            
-
-                            <div class="category-buttons">
-                                
-                                    <a href="#" class="btn category grupo" title="ativismo">Ativismo</a>
-
-                                
-                                    <a href="#" class="btn category grupo" title="geledes">Geledés</a>
-
-                                
-                                    <a href="#" class="btn category grupo" title="vida-civil">Vida Civil</a>
-
-                                
-                                    <a href="#" class="btn category grupo" title="vida-profissional">Vida Profissional</a>
-
-                                                            </div>
-                        </div>
-
-                        <div class="category-content">
-                            
-                            <strong class="category-title" title="biblioteca">Biblioteca Sueli Carneiro</strong>
-
-                            <div class="category-buttons">
-                                <a href="#" class="btn category --dark biblioteca" title="livro">Livros</a>
-                                <a href="#" class="btn category --dark biblioteca" title="exemplar_periodico">Periódicos</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="btn filter-mobile filter-open-mobile">FILTROS AVANÇADOS</button>
                 </div>
-                    </section>
-    </main>
+            </div>
+        </div>            
+
+        <div class="container">
+            <div class="categorys-holder">
+                <div class="category-content">
+                    <strong class="category-title<?= $acervo == 1 ? ' -active' : ''; ?>" title="arquivo">Arquivo Sueli Carneiro</strong>
+
+                    <?php
+                        $sql = "SELECT 
+                                    b.id,
+                                    c.nome
+                                FROM acervo a
+                                INNER JOIN agrupamento b 
+                                    ON a.codigo = b.acervo_codigo
+                                    AND b.agrupamento_superior_codigo IS NULL
+                                INNER JOIN agrupamento_dados_textuais c 
+                                    ON b.codigo = c.agrupamento_codigo 
+                                    AND c.idioma_codigo = 1
+                                WHERE a.nome = 'Arquivo Sueli Carneiro'
+                                ORDER BY c.nome ASC";
+
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
+                        $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    ?>
+
+                    <div class="category-buttons">
+                        <?php if ($categorias): ?>
+                            <?php foreach ($categorias as $data): ?>
+                                <a href="#" class="btn category grupo" title="<?= $data['id']; ?>"><?= $data['nome']; ?></a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <div class="category-content">
+                    <strong class="category-title<?= $acervo == 3 ? ' -active' : ''; ?>" title="biblioteca">Biblioteca Sueli Carneiro</strong>
+
+                    <?php
+                        $sql = "SELECT 
+                                    b.id,
+                                    c.nome
+                                FROM acervo a
+                                INNER JOIN agrupamento b 
+                                    ON a.codigo = b.acervo_codigo
+                                    AND b.agrupamento_superior_codigo IS NULL
+                                INNER JOIN agrupamento_dados_textuais c 
+                                    ON b.codigo = c.agrupamento_codigo 
+                                    AND c.idioma_codigo = 1
+                                WHERE a.nome = 'Biblioteca Sueli Carneiro'
+                                ORDER BY c.nome ASC";
+
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute();
+                        $categorias = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    ?>
+
+                    <div class="category-buttons">
+                        <?php if ($categorias): ?>
+                            <?php foreach ($categorias as $data): ?>
+                                <a href="#" class="btn category grupo" title="<?= $data['id']; ?>"><?= $data['nome']; ?></a>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn filter-mobile filter-open-mobile">FILTROS AVANÇADOS</button>
+        </div>
+    </section>
+</main>
+
+<?php
+    $sql = "SELECT 
+                b.codigo,
+                b.id,
+                c.nome
+            FROM acervo a
+            INNER JOIN agrupamento b 
+                ON a.codigo = b.acervo_codigo
+                AND b.agrupamento_superior_codigo IS NULL
+            INNER JOIN agrupamento_dados_textuais c 
+                ON b.codigo = c.agrupamento_codigo 
+                AND c.idioma_codigo = 1
+            ORDER BY c.nome ASC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $grupos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sql = "SELECT 
+                b.codigo,
+                b.id,
+                c.nome
+            FROM acervo a
+            INNER JOIN agrupamento b 
+                ON a.codigo = b.acervo_codigo
+                AND b.agrupamento_superior_codigo IS NOT NULL
+            INNER JOIN agrupamento_dados_textuais c 
+                ON b.codigo = c.agrupamento_codigo 
+                AND c.idioma_codigo = 1
+            ORDER BY c.nome ASC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $subgrupos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $sql = "SELECT 
+                a.especie_documental_codigo AS codigo,
+                a.nome
+            FROM especie_documental_dados_textuais a 
+            ORDER BY a.nome ASC";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $especies = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 
 <form id="form_itens" method="get" action="">
     <input type="hidden" id="sort" name="sort" value="<?= $sort; ?>">
@@ -243,6 +365,58 @@ $acervos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 <script>
+$(document).on('change', "#acervo", function(event)
+{
+    event.preventDefault();
+
+	$("#secao").val('');
+    $("#grupo").val('');
+    $("#subgrupo").val('');
+    $("#especie").val('');
+    $("#serie").val('');
+
+    $("#pag").val("1");
+    $("#form_itens").submit();
+});
+
+$(document).on('click', ".category-title", function(e){
+	$("#grupo").val('');
+	$("#subgrupo").val('');
+	$("#especie").val('');
+	$("#serie").val('');
+
+	$("#material").val('');
+	$("#pc").val('');
+
+	vs_secao = $(this).attr("title");
+	$("#secao").val(vs_secao);
+
+	if (vs_secao == "arquivo")
+	  $("#acervo").val(1);
+	else if (vs_secao == "biblioteca")
+	  $("#acervo").val(3);
+
+	$("#pag").val("1");
+	$("#form_itens").submit();
+});
+
+$(document).on('click', ".grupo", function(event)
+{
+    event.preventDefault();
+
+    vs_grupo = $(this).attr("title");
+
+    $("#acervo").val(1);
+    $("#grupo").val(vs_grupo);
+    $("#subgrupo").val('');
+
+    $("#material").val('');
+    $("#pc").val('');
+
+    $("#pag").val("1");
+    $("#form_itens").submit();
+});
+
 $(document).on('click', ".--prev", function(e){
     e.preventDefault();
     let pag = parseInt($("#pag").val()) - 1;
@@ -295,6 +469,10 @@ $(document).on('click', '.btn-limpar', function () {
         <div class="container">
             <div class="acervo-page">
 
+                <?php if (!isset($_GET['acervo'])): ?>
+                <input type="hidden" id="secao" name="secao" value="<?= $secao; ?>">
+                <input type="hidden" id="grupo" name="grupo" value="<?= $grupo; ?>">
+                <?php endif; ?>
 
                 <aside class="filter">
                     <h3 class="filter-title">
@@ -316,6 +494,47 @@ $(document).on('click', '.btn-limpar', function () {
                             </select>
                             <button class="btn"><span class="material-symbols-outlined">expand_more</span></button>
                         </div>
+                        
+
+                        <?php if (isset($_GET['acervo']) && !empty($_GET['acervo'])): ?>
+                        <div class="filter-form-select">
+                            <select name="grupo" id="grupo" class="select-filter">
+                                <option value="">Grupo</option>
+                                <?php foreach ($grupos as $grupo): ?>
+                                    <option value="<?= $grupo['id']; ?>" <?= ($_GET['grupo'] ?? '') == $grupo['id'] ? 'selected' : ''; ?>>
+                                        <?= htmlspecialchars($grupo['nome']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button class="btn "><span class="material-symbols-outlined">expand_more</span></button>
+                        </div>                           
+
+                        <div class="filter-form-select">
+                            <select name="subgrupo" id="subgrupo" class="select-filter">
+                                <option value="">Subgrupo</option>
+                                <?php foreach ($subgrupos as $subgrupo): ?>
+                                    <option value="<?= $subgrupo['id']; ?>" <?= ($_GET['subgrupo'] ?? '') == $subgrupo['id'] ? 'selected' : ''; ?>>
+                                        <?= htmlspecialchars($subgrupo['nome']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button class="btn "><span class="material-symbols-outlined">expand_more</span></button>
+                        </div>
+
+                        <div class="filter-form-select">
+                            <select name="especie" id="especie" class="select-filter">
+                                <option value="">Espécie documental</option>
+                                <?php foreach ($especies as $especie): ?>
+                                    <option value="<?= $especie['codigo']; ?>" <?= ($_GET['especie'] ?? '') == $especie['codigo'] ? 'selected' : ''; ?>>
+                                        <?= htmlspecialchars($especie['nome']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <button class="btn "><span class="material-symbols-outlined">expand_more</span></button>
+                        </div>
+                        <?php endif; ?>
+
+
                     </div>
 
                     <div class="filter-search">
@@ -397,7 +616,16 @@ $(document).on('click', '.btn-limpar', function () {
                                 // 🔹 Monta o caminho do link amigável
                                 $identificador = $dado['acervo_identificador'] ?? '';
                                 $tipoItem = (strpos($identificador, 'asc_') !== false) ? 'arquivo' : 'biblioteca';
-                                $link = INCLUDE_PATH . "item/{$tipoItem}/{$dado['codigo']}";
+
+                                // 🔹 Monta identificador formatado com sigla do acervo
+                                $sigla = !empty($dado['acervo_sigla']) ? $dado['acervo_sigla'] : ''; // ex: BSC
+                                $codigo_formatado = str_pad($dado['codigo'], 6, '0', STR_PAD_LEFT);
+                                $identificador_formatado = ($sigla ? strtoupper($sigla) . '_' : '') . $codigo_formatado;
+
+                                // 🔹 Monta o caminho do link amigável
+                                $identificador = $dado['acervo_identificador'] ?? '';
+                                $tipoItem = (strpos(strtolower($sigla), 'asc') !== false) ? 'arquivo' : 'biblioteca';
+                                $link = INCLUDE_PATH . "item/{$tipoItem}/$identificador_formatado";
 
                                 // 🔹 Imagem
                                 $imagem = !empty($dado['imagem_base64']) ? "data:image/png;base64,{$dado['imagem_base64']}" : INCLUDE_PATH . 'assets/img/sem-imagem.png';

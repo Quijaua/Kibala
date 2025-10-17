@@ -1,7 +1,7 @@
 /*M!999999\- enable the sandbox mode */
 -- MariaDB dump 10.19  Distrib 10.11.13-MariaDB, for debian-linux-gnu (x86_64)
 --
--- Host: 127.0.0.1    Database: paramo
+-- Host: 127.0.0.1    Database: kibala
 -- ------------------------------------------------------
 -- Server version	10.11.13-MariaDB-0ubuntu0.24.04.1
 

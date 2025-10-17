@@ -13,6 +13,7 @@ return [
     "db_name" => "REPLACE_NAME",
     "db_user" => "REPLACE_USER",
     "db_password" => "REPLACE_PASSWORD",
+    "institution_url" => "REPLACE_INSTITUTION_URL",
 
     # ================================================ EMAIL ================================================ #
     
@@ -22,7 +23,7 @@ return [
     "smtp_password" => "",
     "smtp_host" => "",
     "smtp_port" => "", # 465 ou 587
-    "smtp_name" => "Páramo - Sistema de Gereciamento de Acervos",
+    "smtp_name" => "Kibala - Sistema de Gereciamento de Acervos",
 
     # ================================================ GOOGLE DRIVE ================================================ #
     
@@ -31,7 +32,7 @@ return [
     "drive_client_id" => "",
     "drive_client_secret" => "",
     "drive_scopes" => "",
-    "drive_redirect_uri" => ($_SESSION["redirect_url"] ?? ($_SERVER['HTTP_HOST'] . '/paramo/app/')) .  "functions/redirect.php",
+    "drive_redirect_uri" => ($_SESSION["redirect_url"] ?? ($_SERVER['HTTP_HOST'] . '/kibala/app/')) .  "functions/redirect.php",
     "drive_api_key" => "",
 
 ];

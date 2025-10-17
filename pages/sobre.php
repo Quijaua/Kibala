@@ -76,7 +76,31 @@
             }
         ?>
 
+        <?php
+            // Seleciona todos os "sobre" que têm o mesmo id mais de uma vez
+            $sql = "
+                SELECT 
+                    a.*
+                FROM representante_digital a
+                WHERE 
+                    a.recurso_sistema_codigo = 83
+                AND
+                    a.registro_codigo = ?
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$data['codigo']]);
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        ?>
+
         <div class="interno container">
+            <div class="imagem_container">
+                <?php if ($result): ?>
+                    <?php foreach ($result as $r): ?>
+                        <img src="<?= INCLUDE_FILE_PATH; ?>?file=<?= $r['path']; ?>&size=original" alt="<?= $r['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>" width="100%" height="auto" class="--horizontal">
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
+
             <div class="sobre--content">
                 <div class="<?= $data['id']; ?>-content">
                     <h2 class="interno--title --active"><?= $data['titulo']; ?></h2>
