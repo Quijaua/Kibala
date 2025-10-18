@@ -4437,7 +4437,9 @@ INSERT INTO `recurso_sistema` VALUES
 (78,'subgrupo','Subgrupos','Subgrupo',2,'agrupamento',1,NULL,0,0,1,0),
 (79,'agrupamento','Agrupamentos','Agrupamento',2,'agrupamento',1,NULL,0,0,1,0),
 (81,'estado_conservacao','Estados de conservação','Estado de conservação',2,'estado_conservacao',0,NULL,0,0,1,0),
-(82,'cromia','Cromias','Cromia',1,'cromia',0,NULL,0,0,1,0);
+(82,'cromia','Cromias','Cromia',1,'cromia',0,NULL,0,0,1,0),
+(79,'sobre','Sobre','Sobre',3,'sobre',0,NULL,0,0,1,0),
+(79,'linha_tempo','Limhas do Tempo','Linha do Tempo',1,'linha_tempo',0,NULL,0,0,1,0);
 /*!40000 ALTER TABLE `recurso_sistema` ENABLE KEYS */;
 UNLOCK TABLES;
 
