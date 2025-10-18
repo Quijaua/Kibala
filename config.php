@@ -1,6 +1,15 @@
 <?php
-    // Inclui o arquivo de configuração e armazena o retorno em uma variável
-    $config = require 'config/custom/envs.php';
+    // Caminho para o arquivo de configuração
+    $configPath = __DIR__ . '/config/custom/envs.php';
+
+    // Se o arquivo não existir, redireciona para a instalação
+    if (!file_exists($configPath)) {
+        header('Location: install');
+        exit;
+    }
+
+    // Se existir, carrega o arquivo normalmente
+    $config = require $configPath;
 
     // Agora você pode acessar cada item assim:
     $db_host = $config['db_host'];
