@@ -144,12 +144,12 @@
             <div class="single--content">
                 <div class="single--image-text">
                     <div class="lightgallery-carrossel">
-                        <?php if ($result): ?>
-                            <?php $imagem = INCLUDE_FILE_PATH . "?file={$result[0]['path']}&size=original"; ?>
-                            <a href="<?= $imagem; ?>" class="single--image-text--image gallery-item">
-                                <img src="<?= $imagem; ?>" alt="<?= $result[0]['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
-                            </a>
+                        <?php $imagem = (isset($result) && !empty($result[0]['path'])) ? INCLUDE_FILE_PATH . "?file={$result[0]['path']}&size=original" : $sem_imagem; ?>
+                        <a href="<?= $imagem; ?>" class="single--image-text--image gallery-item">
+                            <img src="<?= $imagem; ?>" alt="<?= $result[0]['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
+                        </a>
 
+                        <?php if ($result): ?>
                             <?php foreach (array_slice($result, 1) as $r): ?>
                             <?php $imagem = INCLUDE_FILE_PATH . "?file={$r['path']}&size=original"; ?>
                             <div class="single--image-text--carrossel carrossel-single-images slick-initialized slick-slider">
@@ -162,7 +162,6 @@
                                 </div>
                             </div>
                             <?php endforeach; ?>
-
                         <?php endif; ?>
                     </div>
 

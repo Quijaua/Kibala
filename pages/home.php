@@ -63,14 +63,15 @@
         // Busca todos os itens do acervo (substitua a condição WHERE se quiser filtrar)
         $sql = "SELECT
                     a.*,
-                    c.codigo AS codigo_livro,
-                    c.cutter_pha,
-                    c.numero_paginas,
+                    b.codigo AS codigo_documento,
                     d.codigo AS acervo_codigo,
                     d.identificador AS acervo_identificador,
                     d.nome AS acervo_nome,
+                    d.sigla AS acervo_sigla,
+                    d.setor_sistema_codigo,
                     f.nome AS subcategoria,
-                    g.nome AS categoria
+                    g.nome AS categoria,
+                    h.recurso_sistema_padrao_codigo
                 FROM item_acervo a
                 INNER JOIN documento b ON a.codigo = b.item_acervo_codigo
                 LEFT JOIN livro c ON a.codigo = c.item_acervo_codigo
@@ -78,6 +79,7 @@
                 LEFT JOIN agrupamento e ON b.agrupamento_codigo = e.codigo
                 LEFT JOIN agrupamento_dados_textuais f ON e.codigo = f.agrupamento_codigo
                 LEFT JOIN agrupamento_dados_textuais g ON e.agrupamento_superior_codigo = g.agrupamento_codigo
+                LEFT JOIN setor_sistema h ON d.setor_sistema_codigo = h.codigo
                 ORDER BY a.identificador ASC"; // ou outra ordenação que desejar
 
         $stmt = $conn->prepare($sql);
@@ -100,13 +102,50 @@
                 <?php foreach ($documentos as $dado): ?>
 
                     <?php
-                        $dado['imagem'] = (isset($dado['imagem_base64']) && !empty($dado['imagem_base64'])) ? "data:image/png;base64,{$dado['imagem_base64']}" : INCLUDE_PATH . "assets/img/sem-imagem.png";
+                        // 🔹 Monta o caminho do link amigável
+                        $identificador = $dado['acervo_identificador'] ?? '';
+                        $tipoItem = (strpos($identificador, 'asc_') !== false) ? 'arquivo' : 'biblioteca';
+
+                        // 🔹 Monta identificador formatado com sigla do acervo
+                        $sigla = !empty($dado['acervo_sigla']) ? $dado['acervo_sigla'] : ''; // ex: BSC
+                        $codigo_formatado = str_pad($dado['codigo'], 6, '0', STR_PAD_LEFT);
+                        $identificador_formatado = ($sigla ? strtoupper($sigla) . '_' : '') . $codigo_formatado;
+
+                        // 🔹 Monta o caminho do link amigável
+                        $identificador = $dado['acervo_identificador'] ?? '';
+                        $tipoItem = (strpos(strtolower($sigla), 'asc') !== false) ? 'arquivo' : 'biblioteca';
+                        $link = INCLUDE_PATH . "item/{$tipoItem}/$identificador_formatado";
+
+                        // ===== Busca imagem =====
+                        $cod = ($dado['setor_sistema_codigo'] == 1) ? $dado['codigo_documento'] : $dado['codigo_livro'];
+
+                        // Seleciona todos os "sobre" que têm o mesmo id mais de uma vez
+                        $sql = "
+                            SELECT 
+                                a.*
+                            FROM representante_digital a
+                            WHERE 
+                                a.tipo = 1
+                            AND
+                                a.recurso_sistema_codigo = ?
+                            AND
+                                a.registro_codigo = ?
+                            ORDER BY a.sequencia ASC
+                            LIMIT 1
+                        ";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute([$dado['recurso_sistema_padrao_codigo'], $cod]);
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                        // 🔹 Imagem
+                        $dado['imagem'] = (isset($result) && !empty($result['path'])) ? INCLUDE_FILE_PATH . "?file={$result['path']}&size=original" : INCLUDE_PATH . 'assets/img/sem-imagem.png';
+                        $dado['alt_imagem'] = $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro";
                     ?>
 
                     <!-- ===== HTML do card ===== -->
-                    <a href="<?= INCLUDE_PATH; ?>item/arquivo/<?= $dado['codigo']; ?>" class="card" id="">
+                    <a href="<?= $link; ?>" class="card" id="">
                         <div class="card-img">
-                            <img src="<?= $dado['imagem']; ?>" alt="">
+                            <img src="<?= $dado['imagem']; ?>" alt="<?= $dado['alt_imagem']; ?>">
                         </div>
 
                         <h4 class="card-title"><?= $dado['identificador']; ?></h4>
@@ -149,10 +188,14 @@
                 b.numero_paginas,
                 c.codigo AS acervo_codigo,
                 c.identificador AS acervo_identificador,
-                c.nome AS acervo_nome
+                c.nome AS acervo_nome,
+                c.sigla AS acervo_sigla,
+                c.setor_sistema_codigo,
+                d.recurso_sistema_padrao_codigo
             FROM item_acervo a
             INNER JOIN livro b ON a.codigo = b.item_acervo_codigo
             LEFT JOIN acervo c ON a.acervo_codigo = c.codigo
+            LEFT JOIN setor_sistema d ON c.setor_sistema_codigo = d.codigo
             ORDER BY a.titulo ASC"; // ou outra ordenação que desejar
 
         $stmt = $conn->prepare($sql);
@@ -176,7 +219,44 @@
                 <?php foreach ($livros as $dado): ?>
 
                     <?php
-                        $dado['imagem'] = (isset($dado['imagem_base64']) && !empty($dado['imagem_base64'])) ? "data:image/png;base64,{$dado['imagem_base64']}" : INCLUDE_PATH . "assets/img/sem-imagem.png";
+                        // 🔹 Monta o caminho do link amigável
+                        $identificador = $dado['acervo_identificador'] ?? '';
+                        $tipoItem = (strpos($identificador, 'asc_') !== false) ? 'arquivo' : 'biblioteca';
+
+                        // 🔹 Monta identificador formatado com sigla do acervo
+                        $sigla = !empty($dado['acervo_sigla']) ? $dado['acervo_sigla'] : ''; // ex: BSC
+                        $codigo_formatado = str_pad($dado['codigo'], 6, '0', STR_PAD_LEFT);
+                        $identificador_formatado = ($sigla ? strtoupper($sigla) . '_' : '') . $codigo_formatado;
+
+                        // 🔹 Monta o caminho do link amigável
+                        $identificador = $dado['acervo_identificador'] ?? '';
+                        $tipoItem = (strpos(strtolower($sigla), 'asc') !== false) ? 'arquivo' : 'biblioteca';
+                        $link = INCLUDE_PATH . "item/{$tipoItem}/$identificador_formatado";
+
+                        // ===== Busca imagem =====
+                        $cod = ($dado['setor_sistema_codigo'] == 1) ? $dado['codigo_documento'] : $dado['codigo_livro'];
+
+                        // Seleciona todos os "sobre" que têm o mesmo id mais de uma vez
+                        $sql = "
+                            SELECT 
+                                a.*
+                            FROM representante_digital a
+                            WHERE 
+                                a.tipo = 1
+                            AND
+                                a.recurso_sistema_codigo = ?
+                            AND
+                                a.registro_codigo = ?
+                            ORDER BY a.sequencia ASC
+                            LIMIT 1
+                        ";
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute([$dado['recurso_sistema_padrao_codigo'], $cod]);
+                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                        // 🔹 Imagem
+                        $dado['imagem'] = (isset($result) && !empty($result['path'])) ? INCLUDE_FILE_PATH . "?file={$result['path']}&size=original" : INCLUDE_PATH . 'assets/img/sem-imagem.png';
+                        $dado['alt_imagem'] = $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro";
 
                         // ===== Autores =====
                         $sql = "SELECT
@@ -198,9 +278,9 @@
                     ?>
 
                     <!-- ===== HTML do card ===== -->
-                    <a href="<?= INCLUDE_PATH; ?>item/biblioteca/<?= $dado['codigo']; ?>" class="card" id="">
+                    <a href="<?= $link; ?>" class="card" id="">
                         <div class="card-img">
-                            <img src="<?= $dado['imagem']; ?>" alt="">
+                            <img src="<?= $dado['imagem']; ?>" alt="<?= $dado['alt_imagem']; ?>">
                         </div>
 
                         <h4 class="card-title"><?= $dado['identificador']; ?></h4>

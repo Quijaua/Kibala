@@ -29,4 +29,4 @@
     }
 
     define('INCLUDE_PATH', $config['institution_url']);
-    define('INCLUDE_FILE_PATH', INCLUDE_PATH . 'app/functions/serve_file.php');
+    define('INCLUDE_FILE_PATH', INCLUDE_PATH . 'app/functions/public_file.php');

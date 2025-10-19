@@ -135,8 +135,10 @@ $sql = "SELECT DISTINCT
             d.identificador AS acervo_identificador,
             d.nome AS acervo_nome,
             d.sigla AS acervo_sigla,
+            d.setor_sistema_codigo,
             f.nome AS subcategoria,
-            g.nome AS categoria
+            g.nome AS categoria,
+            h.recurso_sistema_padrao_codigo
         FROM item_acervo a
         LEFT JOIN documento b ON a.codigo = b.item_acervo_codigo
         LEFT JOIN livro c ON a.codigo = c.item_acervo_codigo
@@ -144,6 +146,7 @@ $sql = "SELECT DISTINCT
         LEFT JOIN agrupamento e ON b.agrupamento_codigo = e.codigo
         LEFT JOIN agrupamento_dados_textuais f ON e.codigo = f.agrupamento_codigo
         LEFT JOIN agrupamento_dados_textuais g ON e.agrupamento_superior_codigo = g.agrupamento_codigo
+        LEFT JOIN setor_sistema h ON d.setor_sistema_codigo = h.codigo
         $joins
         $where
         ORDER BY $campo_ordem $ord
@@ -627,14 +630,35 @@ $(document).on('click', '.btn-limpar', function () {
                                 $tipoItem = (strpos(strtolower($sigla), 'asc') !== false) ? 'arquivo' : 'biblioteca';
                                 $link = INCLUDE_PATH . "item/{$tipoItem}/$identificador_formatado";
 
+                                // --- Busca imagem ---
+                                $cod = ($dado['setor_sistema_codigo'] == 1) ? $dado['codigo_documento'] : $dado['codigo_livro'];
+
+                                // Seleciona todos os "sobre" que têm o mesmo id mais de uma vez
+                                $sql = "
+                                    SELECT 
+                                        a.*
+                                    FROM representante_digital a
+                                    WHERE 
+                                        a.tipo = 1
+                                    AND
+                                        a.recurso_sistema_codigo = ?
+                                    AND
+                                        a.registro_codigo = ?
+                                    ORDER BY a.sequencia ASC
+                                    LIMIT 1
+                                ";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute([$dado['recurso_sistema_padrao_codigo'], $cod]);
+                                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
                                 // 🔹 Imagem
-                                $imagem = !empty($dado['imagem_base64']) ? "data:image/png;base64,{$dado['imagem_base64']}" : INCLUDE_PATH . 'assets/img/sem-imagem.png';
+                                $imagem = (isset($result) && !empty($result['path'])) ? INCLUDE_FILE_PATH . "?file={$result['path']}&size=original" : INCLUDE_PATH . 'assets/img/sem-imagem.png';
                             ?>
 
                             <!-- CARD -->
                             <a href="<?= $link ?>" class="card <?= (isset($dado['codigo_livro']) && !empty($dado['codigo_livro'])) ? '--dark' : '' ?>">
                                 <div class="card-img">
-                                    <img src="<?= $imagem ?>" alt="">
+                                    <img src="<?= $imagem ?>" alt="<?= $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
                                 </div>
 
                                 <h4 class="card-title"><?= htmlspecialchars($dado['identificador']) ?></h4>
