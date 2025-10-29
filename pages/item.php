@@ -16,7 +16,9 @@
                 e.setor_sistema_codigo,
                 g.nome AS subcategoria,
                 h.nome AS categoria,
-                i.recurso_sistema_padrao_codigo
+                i.recurso_sistema_padrao_codigo,
+                j.titulo AS item_acervo_documento,
+                k.nome AS genero_documental
             FROM item_acervo a
             LEFT JOIN item_acervo_dados_textuais b ON a.codigo = b.item_acervo_codigo
             LEFT JOIN livro c ON a.codigo = c.item_acervo_codigo
@@ -26,6 +28,8 @@
             LEFT JOIN agrupamento_dados_textuais g ON f.codigo = g.agrupamento_codigo
             LEFT JOIN agrupamento_dados_textuais h ON f.agrupamento_superior_codigo = h.agrupamento_codigo
             LEFT JOIN setor_sistema i ON e.setor_sistema_codigo = i.codigo
+            LEFT JOIN item_acervo_dados_textuais j ON a.codigo = j.item_acervo_codigo
+            LEFT JOIN genero_documental k ON d.genero_documental_codigo = k.codigo
             WHERE a.codigo = ?";
     $stmt = $conn->prepare($sql);
     $stmt->execute([$param]);
@@ -64,6 +68,113 @@
     $editoras = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $dado['editoras'] = array_column($editoras, 'nome');
+
+    $sql = "SELECT
+                b.nome
+            FROM item_acervo_suporte a
+            INNER JOIN suporte b ON a.suporte_codigo = b.codigo
+            WHERE a.item_acervo_codigo = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$dado['codigo']]);
+    $suportes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $dado['suportes'] = array_column($suportes, 'nome');
+
+    $sql = "SELECT
+            b.nome AS especie_nome,
+            c.nome AS tipo_documental
+        FROM documento_especie_documental a
+        INNER JOIN especie_documental_dados_textuais b ON a.especie_documental_codigo = b.especie_documental_codigo
+        INNER JOIN tipo_documental c ON a.tipo_documental_codigo = c.codigo
+        WHERE a.documento_codigo = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$dado['codigo_documento']]);
+    $especiesDocumentais = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $especies = [];
+    foreach ($especiesDocumentais as $linha) {
+        $especies[] = "{$linha['especie_nome']} ({$linha['tipo_documental']})";
+    }
+
+    $dado['especies'] = implode(', ', $especies);
+
+    $sql = "SELECT 
+            b.nome,
+            a.funcao_entidade
+        FROM item_acervo_entidade a
+        INNER JOIN entidade b ON a.entidade_codigo = b.codigo
+        WHERE a.item_acervo_codigo = ? 
+        AND a.tipo_autor_codigo != ''
+        GROUP BY 
+            a.item_acervo_codigo, 
+            a.entidade_codigo, 
+            a.funcao_entidade";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$dado['codigo']]);
+    $acervoEntidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $entidades = [];
+    foreach ($acervoEntidades as $linha) {
+        $entidades[] = (!empty($linha['funcao_entidade'])) 
+            ? "{$linha['nome']} ({$linha['funcao_entidade']})" 
+            : "{$linha['nome']}";
+    }
+
+    $dado['entidades'] = implode(', ', $entidades);
+
+    $sql = "SELECT
+            b.nome,
+            c.nome AS contexto_superior_nome
+        FROM contexto a
+        INNER JOIN contexto_dados_textuais b ON a.codigo = b.contexto_codigo
+        LEFT JOIN contexto_dados_textuais c ON a.contexto_superior_codigo = c.contexto_codigo
+        WHERE a.acervo_codigo = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$dado['acervo_codigo']]);
+    $itemContextos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $contextos = [];
+    foreach ($itemContextos as $linha) {
+        $contextos[] = (!empty($linha['contexto_superior_nome'])) ? "{$linha['contexto_superior_nome']} > {$linha['nome']}" : $linha['nome'];
+    }
+
+    $dado['contextos'] = implode(', ', $contextos);
+
+    $sql = "SELECT
+                b.nome
+            FROM documento_formato a
+            INNER JOIN formato b ON a.formato_codigo = b.codigo
+            WHERE a.documento_codigo = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$dado['codigo_documento']]);
+    $formatos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $dado['formatos'] = array_column($formatos, 'nome');
+
+    if ($dado['setor_sistema_codigo'] == 1) { // Apenas para documento
+        $sql = "SELECT
+                    b.nome,
+                    a.descricao
+                FROM item_acervo_estado_conservacao a
+                INNER JOIN estado_conservacao b ON a.estado_conservacao_codigo = b.codigo
+                WHERE a.item_acervo_codigo = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$dado['codigo']]);
+        $conservacao = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        $dado['estado_conservacao'] = $conservacao['nome'] . (!empty($conservacao['descricao']) ? " - {$conservacao['descricao']}" : "");
+    }
+
+    $sql = "SELECT
+                b.nome
+            FROM item_acervo_localidade a
+            INNER JOIN localidade b ON a.localidade_codigo = b.codigo
+            WHERE a.item_acervo_codigo = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$dado['codigo']]);
+    $localidades = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $dado['localidades'] = array_column($localidades, 'nome');
 
     $sql = "SELECT
                 b.nome
@@ -146,7 +257,7 @@
                     <div class="lightgallery-carrossel">
                         <?php $imagem = (isset($result) && !empty($result[0]['path'])) ? INCLUDE_FILE_PATH . "?file={$result[0]['path']}&size=original" : $sem_imagem; ?>
                         <a href="<?= $imagem; ?>" class="single--image-text--image gallery-item">
-                            <img src="<?= $imagem; ?>" alt="<?= $result[0]['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
+                            <img src="<?= $imagem; ?>" alt="<?= $dado['item_acervo_documento'] ?? $result[0]['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
                         </a>
 
                         <?php if ($result): ?>
@@ -156,7 +267,7 @@
                                 <div class="slick-list draggable">
                                     <div class="slick-track" style="opacity: 1; width: 240px; transform: translate3d(0px, 0px, 0px);">
                                         <a href="<?= $imagem; ?>" class="gallery-item slick-slide slick-current slick-active" data-lg-id="8dfa757d-2038-4219-baeb-2ec567838bde" data-slick-index="0" aria-hidden="false" style="width: 176px;" tabindex="0">
-                                            <img src="<?= $imagem; ?>" alt="<?= $r['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
+                                            <img src="<?= $imagem; ?>" alt="<?= $dado['item_acervo_documento'] ?? $r['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
                                         </a>
                                     </div>
                                 </div>
@@ -194,6 +305,76 @@
                     <div id="copy-message" class="text-center mt-2" style="display:none;">
                         <p>Link copiado</p>
                     </div>
+
+                    <?php if (isset($dado['genero_documental']) && !empty($dado['genero_documental'])): ?>
+                    <div class="single--details--info">
+                        <strong>Espécie/Tipo documental<span class="tooltip-btn">+ <span class="tooltip">Classificação que indica a natureza e a forma de um documento, conforme sua função administrativa, jurídica ou informativa.</span></span></strong>
+
+                        <span>
+                            <?= $dado['genero_documental']; ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($dado['suportes']) && count($dado['suportes']) > 0): ?>
+                    <div class="single--details--info">
+                        <strong>Suporte<span class="tooltip-btn">+ <span class="tooltip">Material físico no qual o conteúdo do documento está registrado, como papel, filme, fita magnética ou meio digital.</span></span></strong>
+
+                        <span>
+                            <?= implode(', ', $dado['suportes']); ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($dado['especies']) && !empty($dado['especies'])): ?>
+                    <div class="single--details--info">
+                        <strong>Espécie<span class="tooltip-btn">+ <span class="tooltip">Designação que identifica o tipo documental segundo sua configuração e finalidade, como ofício, relatório, ata ou contrato.</span></span></strong>
+
+                        <span>
+                            <?= $dado['especies']; ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($dado['entidades']) && !empty($dado['entidades'])): ?>
+                    <div class="single--details--info">
+                        <strong>Agentes<span class="tooltip-btn">+ <span class="tooltip">Pessoas físicas ou jurídicas responsáveis pela criação, produção, acumulação ou custódia do documento.</span></span></strong>
+
+                        <span>
+                            <?= $dado['entidades']; ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($dado['contextos']) && !empty($dado['contextos'])): ?>
+                    <div class="single--details--info">
+                        <strong>Contexto<span class="tooltip-btn">+ <span class="tooltip">Conjunto de circunstâncias históricas, institucionais ou funcionais que explicam a origem e a função do documento.</span></span></strong>
+
+                        <span>
+                            <?= $dado['contextos']; ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($dado['formatos']) && count($dado['formatos']) > 0): ?>
+                    <div class="single--details--info">
+                        <strong>Formatos<span class="tooltip-btn">+ <span class="tooltip">Configuração física ou digital do documento, indicando dimensões, estrutura e apresentação do conteúdo.</span></span></strong>
+
+                        <span>
+                            <?= implode(', ', $dado['formatos']); ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
+
+                    <?php if (isset($dado['estado_conservacao']) && !empty($dado['estado_conservacao'])): ?>
+                    <div class="single--details--info">
+                        <strong>Estado de conservação<span class="tooltip-btn">+ <span class="tooltip">Condição física e material do documento, indicando seu grau de integridade, preservação ou deterioração.</span></span></strong>
+
+                        <span>
+                            <?= $dado['estado_conservacao']; ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
 
                     <?php if (isset($dado['cutter_pha']) && !empty($dado['cutter_pha'])): ?>
                     <div class="single--details--info">
@@ -249,11 +430,15 @@
                     </div>
                     <?php endif; ?>
 
-                    <!-- <div class="single--details--info">
-                        <strong>Série<span class="tooltip-btn">+ <span class="tooltip">Conjunto de obras organizado por uma editora e impresso sob um título coletivo e formato padronizado.</span></span></strong>
-                        
-                        <span>Clássicos de ouro: gregos e romanos</span>
-                    </div> -->
+                    <?php if (isset($dado['localidades']) && count($dado['localidades']) > 0): ?>
+                    <div class="single--details--info">
+                        <strong>Local<span class="tooltip-btn">+ <span class="tooltip">Identificação de cidade, estado, país. Local de publicação.</span></span></strong>
+
+                        <span>
+                            <?= implode(' | ', $dado['localidades']); ?>
+                        </span>
+                    </div>
+                    <?php endif; ?>
 
                     <?php if (isset($dado['idiomas']) && count($dado['idiomas']) > 0): ?>
                     <div class="single--details--info">

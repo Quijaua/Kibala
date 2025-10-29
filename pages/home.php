@@ -71,7 +71,8 @@
                     d.setor_sistema_codigo,
                     f.nome AS subcategoria,
                     g.nome AS categoria,
-                    h.recurso_sistema_padrao_codigo
+                    h.recurso_sistema_padrao_codigo,
+                    i.titulo AS item_acervo_documento
                 FROM item_acervo a
                 INNER JOIN documento b ON a.codigo = b.item_acervo_codigo
                 LEFT JOIN livro c ON a.codigo = c.item_acervo_codigo
@@ -80,6 +81,7 @@
                 LEFT JOIN agrupamento_dados_textuais f ON e.codigo = f.agrupamento_codigo
                 LEFT JOIN agrupamento_dados_textuais g ON e.agrupamento_superior_codigo = g.agrupamento_codigo
                 LEFT JOIN setor_sistema h ON d.setor_sistema_codigo = h.codigo
+                LEFT JOIN item_acervo_dados_textuais i ON a.codigo = i.item_acervo_codigo
                 ORDER BY a.identificador ASC"; // ou outra ordenação que desejar
 
         $stmt = $conn->prepare($sql);
@@ -139,7 +141,7 @@
 
                         // 🔹 Imagem
                         $dado['imagem'] = (isset($result) && !empty($result['path'])) ? INCLUDE_FILE_PATH . "?file={$result['path']}&size=original" : INCLUDE_PATH . 'assets/img/sem-imagem.png';
-                        $dado['alt_imagem'] = $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro";
+                        $dado['alt_imagem'] = $dado['item_acervo_documento'] ?? $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro";
                     ?>
 
                     <!-- ===== HTML do card ===== -->
@@ -191,11 +193,13 @@
                 c.nome AS acervo_nome,
                 c.sigla AS acervo_sigla,
                 c.setor_sistema_codigo,
-                d.recurso_sistema_padrao_codigo
+                d.recurso_sistema_padrao_codigo,
+                e.titulo AS item_acervo_documento
             FROM item_acervo a
             INNER JOIN livro b ON a.codigo = b.item_acervo_codigo
             LEFT JOIN acervo c ON a.acervo_codigo = c.codigo
             LEFT JOIN setor_sistema d ON c.setor_sistema_codigo = d.codigo
+            LEFT JOIN item_acervo_dados_textuais e ON a.codigo = e.item_acervo_codigo
             ORDER BY a.titulo ASC"; // ou outra ordenação que desejar
 
         $stmt = $conn->prepare($sql);
@@ -256,7 +260,7 @@
 
                         // 🔹 Imagem
                         $dado['imagem'] = (isset($result) && !empty($result['path'])) ? INCLUDE_FILE_PATH . "?file={$result['path']}&size=original" : INCLUDE_PATH . 'assets/img/sem-imagem.png';
-                        $dado['alt_imagem'] = $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro";
+                        $dado['alt_imagem'] = $dado['item_acervo_documento'] ?? $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro";
 
                         // ===== Autores =====
                         $sql = "SELECT

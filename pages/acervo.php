@@ -138,7 +138,8 @@ $sql = "SELECT DISTINCT
             d.setor_sistema_codigo,
             f.nome AS subcategoria,
             g.nome AS categoria,
-            h.recurso_sistema_padrao_codigo
+            h.recurso_sistema_padrao_codigo,
+            i.titulo AS item_acervo_documento
         FROM item_acervo a
         LEFT JOIN documento b ON a.codigo = b.item_acervo_codigo
         LEFT JOIN livro c ON a.codigo = c.item_acervo_codigo
@@ -147,6 +148,7 @@ $sql = "SELECT DISTINCT
         LEFT JOIN agrupamento_dados_textuais f ON e.codigo = f.agrupamento_codigo
         LEFT JOIN agrupamento_dados_textuais g ON e.agrupamento_superior_codigo = g.agrupamento_codigo
         LEFT JOIN setor_sistema h ON d.setor_sistema_codigo = h.codigo
+        LEFT JOIN item_acervo_dados_textuais i ON a.codigo = i.item_acervo_codigo
         $joins
         $where
         ORDER BY $campo_ordem $ord
@@ -658,7 +660,7 @@ $(document).on('click', '.btn-limpar', function () {
                             <!-- CARD -->
                             <a href="<?= $link ?>" class="card <?= (isset($dado['codigo_livro']) && !empty($dado['codigo_livro'])) ? '--dark' : '' ?>">
                                 <div class="card-img">
-                                    <img src="<?= $imagem ?>" alt="<?= $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
+                                    <img src="<?= $imagem ?>" alt="<?= $dado['item_acervo_documento'] ?? $result['legenda'] ?? "Arranjo Arquivo Sueli Carneiro"; ?>">
                                 </div>
 
                                 <h4 class="card-title"><?= htmlspecialchars($dado['identificador']) ?></h4>
