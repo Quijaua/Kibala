@@ -101,7 +101,7 @@ const MESSAGES = [
     "TUTORIALS" => [
         "WRITING_PERMISSIONS" => [
             "TYPE" => "info",
-            "MESSAGE" => "Caso não saiba alterar as permissões, verifique esse passo a passo: <a href=\"https://paramosoftware.com.br/documentacao/instalacao/permissoes-pastas\">Como dar permissões de leitura e escrita para uma pasta </a>"
+            "MESSAGE" => "Caso não saiba alterar as permissões, verifique esse passo a passo: <a href=\"#\">Como dar permissões de leitura e escrita para uma pasta </a>"
         ],
     ],
     "ERRORS" => [
@@ -580,13 +580,13 @@ function unzip_files(): bool
     }
 
     $zip = new ZipArchive;
-    $res = $zip->open(dirname(__FILE__) . "/paramo.zip");
+    $res = $zip->open(dirname(__FILE__) . "/kibala.zip");
 
     if ($res === TRUE)
     {
         if ($zip->extractTo(dirname(__FILE__) . "/../")) {
             $zip->close();
-            unlink(dirname(__FILE__) . "/paramo.zip");
+            unlink(dirname(__FILE__) . "/kibala.zip");
             return true;
         } else {
             $zip->close();
