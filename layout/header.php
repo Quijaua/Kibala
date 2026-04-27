@@ -19,16 +19,15 @@
 <header>
     <div class="container">
         <a href="<?= INCLUDE_PATH; ?>">
-            <h1 class="logo">
-                <strong>ACERVO</strong>
-                <strong>SUELI</strong>
-                <strong>CARNEIRO</strong>
-            </h1>
+            <div class="logo">
+                <img src="<?= INCLUDE_PATH; ?>assets/img/logo-exemplo.png" alt="Nome de organização" class="logo-apoio">
+
+            </div>
         </a>
         <span class="menu-btn material-symbols-outlined">menu</span>
         <nav class="menu">
             <a href="<?= INCLUDE_PATH; ?>acervo" class="menu__link">Acervo</a>
-            <a href="<?= INCLUDE_PATH; ?>" class="menu__link">EXPOSIÇÕES VIRTUAIS</a>
+            <a href="<?= INCLUDE_PATH; ?>" class="menu__link">Kibala</a>
             <a href="<?= INCLUDE_PATH; ?>linha-do-tempo" class="menu__link">LINHA DO TEMPO</a>
             <div href="sobre" class="menu__link --has-child">
                 <span>SOBRE <span class="icon material-symbols-outlined">expand_more</span></span>

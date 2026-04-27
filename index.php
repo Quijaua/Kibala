@@ -19,7 +19,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acervo Sueli Carneiro</title>
+    <title>Kibala</title>
     <link rel="android-chrome" sizes="192x192" href="<?= INCLUDE_PATH; ?>assets/img/favicon_io/android-chrome-192x192.png">
     <link rel="android-chrome" sizes="521x512" href="<?= INCLUDE_PATH; ?>assets/img/favicon_io/android-chrome-512x512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="<?= INCLUDE_PATH; ?>assets/img/favicon_io/apple-touch-icon.png">
@@ -117,14 +117,6 @@
     <script src="<?= INCLUDE_PATH; ?>assets/js/lightGallery.js"></script>
     <script src="<?= INCLUDE_PATH; ?>assets/js/tolltip.js"></script>
 
-	<script src="https://plugin.handtalk.me/web/latest/handtalk.min.js"></script>
-	<script>
-		var ht = new HT({
-			token:"b981fbcae1c596ce73bcde4dbc7d7555",
-			avatar: "MAYA",
-			pageSpeech: true
-		});
-	</script>
 
 </body>
 </html>

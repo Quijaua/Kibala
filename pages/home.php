@@ -2,14 +2,12 @@
       <section class="hero">
         <div class="container">
           <div class="logo">
-            <strong>ACERVO</strong>
-            <strong>SUELI</strong>
-            <strong>CARNEIRO</strong>
+            <img src="/assets/img/acervo_fisico_digital.svg" alt="Descrição do SVG" width="275">
           </div>
 
           <div class="hero-content">
-            <h2 class="hero-title">Filósofa, escritora e ativista </h2>
-            <div class="hero-desc"><p>Os documentos que Sueli Carneiro acumulou ao longo de sua vida, até 2022, encontram-se aqui &nbsp;disponíveis em formato digital, junto com as referências de livros que compõem sua biblioteca pessoal. Estão publicados para o apoio às &nbsp;pesquisas e ampliação do entendimento de sua obra, da história do ativismo por ela empreendido desde os anos 1970, em sua luta por igualdade racial e de gênero. Este é um projeto em aprimoramento constante: seguiremos inserindo novos documentos e também completando descrições do que já está disponível. Para dúvidas e contribuições com informações referentes aos conteúdos deste acervo, escreva para <a href="mailto:acervosuelicarneiro@casasuelicarneiro.org.br">acervosuelicarneiro@casasuelicarneiro.org.br</a></p></div>
+            <h2 class="hero-title">Kibala - Gestão de acervos digitais</h2>
+            <div class="hero-desc"><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec viverra lorem nec facilisis cursus. Suspendisse ultricies diam at libero accumsan porta. Nulla hendrerit nec mi in tincidunt. Pellentesque dignissim malesuada semper. Morbi convallis lacinia magna. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p></div>
           </div>
 
           <div class="hero-wrapper-holder" style="display:none">
