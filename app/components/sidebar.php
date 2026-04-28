@@ -486,8 +486,28 @@ if (!$vb_usuario_externo)
         <?php
         }
         ?>
+
+<?php
+$config = include __DIR__ . '/../../config/custom/envs.php';
+define('INSTITUTION_URL', $config['institution_url']);
+?>
+
+<li class="link-externo"><a href="<?php echo INSTITUTION_URL; ?>" target="_blank" >
+
+<svg class="nav-le">
+<use xlink:href="assets/libraries/@coreui/icons/svg/free.svg#cil-globe-alt"></use>
+</svg>
+Visitar site</a></li>
+
     </ul>
 </div>
+
+<style>
+.link-externo a {color:#fff !important}
+.link-externo a:hover {color: #198754 !important}
+.link-externo li {list-style-type: none;}
+.nav-le {width:24px}
+</style>
 
 <?php
 }
